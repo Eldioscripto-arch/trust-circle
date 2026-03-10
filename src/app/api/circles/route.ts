@@ -18,6 +18,18 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const wallet = session.user.id.toLowerCase()
+
+  // Verificar que tiene World ID verificado
+  const { data: user } = await supabaseAdmin
+    .from('users')
+    .select('world_id_verified')
+    .eq('wallet_address', wallet)
+    .single()
+
+  if (!user?.world_id_verified) {
+    return NextResponse.json({ error: 'Debes verificar tu World ID para crear círculos' }, { status: 403 })
+  }
+
   const body = await req.json()
   const { name, contributionAmount, cycleDurationSeconds, maxMembers, isPublic } = body
   if (!name || !contributionAmount || !cycleDurationSeconds || !maxMembers)
