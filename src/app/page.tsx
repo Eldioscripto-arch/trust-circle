@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { AuthButton } from '@/components/AuthButton';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type CircleStatus = 'pending' | 'paid' | 'open';
 
@@ -21,14 +21,6 @@ interface Circle {
   status: CircleStatus;
   poolAmount: number;
 }
-
-const MOCK_CIRCLES: Circle[] = [
-  { id: '1', name: 'Familia Martínez', members: 6, maxMembers: 6, contribution: 50, currency: 'USDC', cycle: 2, totalCycles: 6, daysLeft: 0, hoursLeft: 6, paidCount: 4, status: 'pending', poolAmount: 300 },
-  { id: '2', name: 'Amigos del trabajo', members: 7, maxMembers: 7, contribution: 60, currency: 'USDC', cycle: 2, totalCycles: 7, daysLeft: 18, paidCount: 5, status: 'paid', poolAmount: 420 },
-  { id: '3', name: 'Vecinos Bloque 4', members: 3, maxMembers: 10, contribution: 100, currency: 'USDC', cycle: 0, totalCycles: 10, daysLeft: 0, paidCount: 0, status: 'open', poolAmount: 0 },
-];
-
-const NEXT_TURN = { circle: 'Amigos del trabajo', cycle: 3, days: 18, amount: 420 };
 
 function Badge({ status }: { status: CircleStatus }) {
   const cfg = {
@@ -56,7 +48,7 @@ function CircleCard({ circle }: { circle: Circle }) {
       <div className="flex items-start justify-between mb-3">
         <div>
           <p className="font-bold text-sm" style={{ color: '#e2e8f0' }}>{circle.name}</p>
-          <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{circle.members}/{circle.maxMembers} miembros · ${circle.contribution} {circle.currency}/semana</p>
+          <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{circle.members}/{circle.maxMembers} miembros · ${circle.contribution} USDC/ciclo</p>
         </div>
         <Badge status={circle.status} />
       </div>
@@ -72,12 +64,12 @@ function CircleCard({ circle }: { circle: Circle }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex gap-0.5">
-            {Array.from({ length: circle.maxMembers }).map((_, i) => (
+            {Array.from({ length: Math.min(circle.maxMembers, 10) }).map((_, i) => (
               <div key={i} className="w-2 h-2 rounded-full" style={{ background: i < circle.paidCount ? '#38a169' : '#2a3441' }} />
             ))}
           </div>
           <span className="text-xs" style={{ color: '#718096' }}>
-            {circle.status === 'open' ? `${circle.members}/${circle.maxMembers} se unieron` : `${circle.paidCount}/${circle.members} pagaron`}
+            {circle.status === 'open' ? `${circle.members}/${circle.maxMembers} unidos` : `${circle.paidCount}/${circle.members} pagaron`}
           </span>
         </div>
         <span className="font-bold text-sm" style={{ color: '#f0b429' }}>
@@ -91,12 +83,12 @@ function CircleCard({ circle }: { circle: Circle }) {
 function CelebrationScreen({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center z-50" style={{ background: 'rgba(13,17,23,0.97)' }}>
-      <div className="text-6xl" style={{ animation: 'bounce 0.8s ease infinite alternate' }}>🎉</div>
-      <p className="mt-5 text-xs uppercase tracking-widest" style={{ color: '#f0b429', letterSpacing: 3 }}>¡Recibiste el pozo!</p>
+      <div className="text-6xl">🎉</div>
+      <p className="mt-5 text-xs uppercase tracking-widest" style={{ color: '#f0b429' }}>¡Recibiste el pozo!</p>
       <p className="font-black mt-2" style={{ fontSize: 56, letterSpacing: -3, color: '#e2e8f0' }}>
         <span style={{ fontSize: 24, color: '#2775ca', verticalAlign: 'super' }}>$</span>350.00
       </p>
-      <p className="text-base mt-1.5" style={{ color: '#718096' }}>Familia Martínez — Ciclo 2 de 6</p>
+      <p className="text-base mt-1.5" style={{ color: '#718096' }}>Ciclo completado</p>
       <button onClick={onClose} className="mt-8 px-12 py-4 rounded-2xl font-bold text-black"
         style={{ background: '#f0b429', fontSize: 15 }}>Ver mi balance ✦</button>
     </div>
@@ -106,7 +98,60 @@ function CelebrationScreen({ onClose }: { onClose: () => void }) {
 export default function Home() {
   const { data: session } = useSession();
   const [showCelebration, setShowCelebration] = useState(false);
-  const pendingCircle = MOCK_CIRCLES.find(c => c.status === 'pending');
+  const [circles, setCircles] = useState<Circle[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!session) return;
+
+    // Registrar usuario al hacer login
+    fetch('/api/users', { method: 'POST' }).catch(() => {});
+
+    // Cargar círculos reales
+    setLoading(true);
+    fetch('/api/circles')
+      .then(r => r.json())
+      .then(data => {
+        if (data.circles && data.circles.length > 0) {
+          const mapped: Circle[] = data.circles.map((item: any) => {
+            const c = item.circles;
+            const now = Date.now();
+            const cycleEnd = c.cycle_start_time
+              ? new Date(c.cycle_start_time).getTime() + c.cycle_duration_seconds * 1000
+              : now;
+            const msLeft = cycleEnd - now;
+            const daysLeft = Math.max(0, Math.floor(msLeft / 86400000));
+            const hoursLeft = Math.max(0, Math.floor((msLeft % 86400000) / 3600000));
+
+            let status: CircleStatus = 'open';
+            if (c.status === 'active') status = daysLeft === 0 ? 'pending' : 'paid';
+
+            return {
+              id: c.id,
+              name: c.name,
+              members: c.member_count,
+              maxMembers: c.max_members,
+              contribution: Number(c.contribution_amount),
+              currency: 'USDC',
+              cycle: c.current_cycle,
+              totalCycles: c.max_members,
+              daysLeft,
+              hoursLeft,
+              paidCount: 0,
+              status,
+              poolAmount: c.member_count * Number(c.contribution_amount),
+            };
+          });
+          setCircles(mapped);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [session]);
+
+  const totalSaved = circles.reduce((sum, c) => sum + c.poolAmount, 0);
+  const activeCount = circles.filter(c => c.status !== 'open').length;
+  const pendingCircle = circles.find(c => c.status === 'pending');
 
   if (!session) {
     return (
@@ -133,7 +178,9 @@ export default function Home() {
             Trust<span style={{ color: '#718096', fontWeight: 400 }}>Circle</span>
           </h1>
           <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-black"
-            style={{ background: 'linear-gradient(135deg, #f0b429, #ed8936)' }}>EL</div>
+            style={{ background: 'linear-gradient(135deg, #f0b429, #ed8936)' }}>
+            {session.user?.name?.slice(2, 4).toUpperCase() || 'TC'}
+          </div>
         </div>
 
         {pendingCircle && (
@@ -152,42 +199,23 @@ export default function Home() {
         )}
 
         <div className="mx-5 mt-4 rounded-2xl p-6" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
-          <p className="text-xs uppercase tracking-widest" style={{ color: '#718096' }}>Total ahorrado</p>
+          <p className="text-xs uppercase tracking-widest" style={{ color: '#718096' }}>Total en círculos</p>
           <div className="mt-2 leading-none">
             <span className="text-lg font-semibold align-super" style={{ color: '#2775ca' }}>$</span>
-            <span className="font-black" style={{ fontSize: 42, letterSpacing: -2, color: '#e2e8f0' }}>1,240</span>
-            <span className="text-xl" style={{ color: '#4a5568' }}>.00</span>
+            <span className="font-black" style={{ fontSize: 42, letterSpacing: -2, color: '#e2e8f0' }}>
+              {loading ? '...' : totalSaved.toLocaleString()}
+            </span>
           </div>
           <div className="mt-4 flex gap-5">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs uppercase" style={{ color: '#4a5568', letterSpacing: 1 }}>Círculos activos</span>
-              <span className="text-sm font-semibold" style={{ color: '#f0b429' }}>3</span>
+              <span className="text-sm font-semibold" style={{ color: '#f0b429' }}>{activeCount}</span>
             </div>
             <div style={{ width: 1, background: '#2a3441' }} />
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs uppercase" style={{ color: '#4a5568', letterSpacing: 1 }}>Recibido total</span>
-              <span className="text-sm font-semibold" style={{ color: '#38a169' }}>$700</span>
+              <span className="text-xs uppercase" style={{ color: '#4a5568', letterSpacing: 1 }}>Total círculos</span>
+              <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>{circles.length}</span>
             </div>
-            <div style={{ width: 1, background: '#2a3441' }} />
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs uppercase" style={{ color: '#4a5568', letterSpacing: 1 }}>Por recibir</span>
-              <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>$350</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mx-5 mt-4 rounded-2xl p-4 flex items-center gap-4"
-          style={{ background: 'linear-gradient(135deg, rgba(240,180,41,0.08), rgba(237,137,54,0.05))', border: '1px solid rgba(240,180,41,0.2)' }}>
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl"
-            style={{ background: 'rgba(240,180,41,0.15)' }}>🏆</div>
-          <div className="flex-1">
-            <p className="text-xs uppercase tracking-widest" style={{ color: '#a07820' }}>Próximo turno</p>
-            <p className="font-bold mt-0.5 text-sm" style={{ color: '#e2e8f0' }}>{NEXT_TURN.circle}</p>
-            <p className="text-xs mt-0.5" style={{ color: '#f0b429' }}>Ciclo {NEXT_TURN.cycle} · en {NEXT_TURN.days} días</p>
-          </div>
-          <div className="text-right">
-            <p className="font-black" style={{ fontSize: 20, color: '#f0b429' }}>${NEXT_TURN.amount}</p>
-            <p className="text-xs uppercase" style={{ color: '#4a5568', letterSpacing: 1 }}>USDC</p>
           </div>
         </div>
 
@@ -197,7 +225,17 @@ export default function Home() {
         </div>
 
         <div className="px-5 flex flex-col gap-2.5">
-          {MOCK_CIRCLES.map(c => <CircleCard key={c.id} circle={c} />)}
+          {loading && (
+            <div className="text-center py-8" style={{ color: '#4a5568' }}>Cargando...</div>
+          )}
+          {!loading && circles.length === 0 && (
+            <div className="text-center py-12 rounded-2xl" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
+              <p className="text-2xl mb-3">⬡</p>
+              <p className="text-sm font-medium" style={{ color: '#e2e8f0' }}>Aún no tienes círculos</p>
+              <p className="text-xs mt-1" style={{ color: '#4a5568' }}>Toca + para crear el primero</p>
+            </div>
+          )}
+          {circles.map(c => <CircleCard key={c.id} circle={c} />)}
         </div>
 
       </div>
@@ -206,11 +244,10 @@ export default function Home() {
         style={{ background: '#f0b429', boxShadow: '0 4px 24px rgba(240,180,41,0.4)' }}>＋</div>
 
       <div className="fixed bottom-0 left-0 right-0 flex" style={{ background: 'rgba(13,17,23,0.95)', backdropFilter: 'blur(12px)', borderTop: '1px solid #2a3441', paddingBottom: 20, zIndex: 99 }}>
-        {[{ id: 'home', icon: '⬡', label: 'Inicio', active: true }, { id: 'explore', icon: '🔍', label: 'Explorar', badge: 12 }, { id: 'history', icon: '📊', label: 'Historial' }, { id: 'profile', icon: '👤', label: 'Perfil' }].map(item => (
+        {[{ id: 'home', icon: '⬡', label: 'Inicio', active: true }, { id: 'explore', icon: '🔍', label: 'Explorar' }, { id: 'history', icon: '📊', label: 'Historial' }, { id: 'profile', icon: '👤', label: 'Perfil' }].map(item => (
           <div key={item.id} className="flex-1 flex flex-col items-center gap-1 pt-2.5 relative cursor-pointer">
-            <span style={{ fontSize: 20, opacity: item.active ? 1 : 0.4 }}>{item.icon}</span>
-            <span className="text-xs" style={{ color: item.active ? '#f0b429' : '#4a5568' }}>{item.label}</span>
-            {item.badge && <div className="absolute top-1.5 right-6 w-4 h-4 rounded-full flex items-center justify-center text-black font-bold" style={{ background: '#f0b429', fontSize: 9 }}>{item.badge}</div>}
+            <span style={{ fontSize: 20, opacity: (item as any).active ? 1 : 0.4 }}>{item.icon}</span>
+            <span className="text-xs" style={{ color: (item as any).active ? '#f0b429' : '#4a5568' }}>{item.label}</span>
           </div>
         ))}
       </div>
