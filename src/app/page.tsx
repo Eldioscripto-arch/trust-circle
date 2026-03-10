@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { AuthButton } from '@/components/AuthButton';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 type CircleStatus = 'pending' | 'paid' | 'open';
 
@@ -97,6 +98,7 @@ function CelebrationScreen({ onClose }: { onClose: () => void }) {
 
 export default function Home() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [showCelebration, setShowCelebration] = useState(false);
   const [circles, setCircles] = useState<Circle[]>([]);
   const [loading, setLoading] = useState(false);
@@ -241,7 +243,7 @@ export default function Home() {
       </div>
 
       <div className="fixed bottom-24 right-5 w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-black font-bold cursor-pointer z-50"
-        style={{ background: '#f0b429', boxShadow: '0 4px 24px rgba(240,180,41,0.4)' }}>＋</div>
+        style={{ background: '#f0b429', boxShadow: '0 4px 24px rgba(240,180,41,0.4)' }} onClick={() => router.push('/circles/new')}>＋</div>
 
       <div className="fixed bottom-0 left-0 right-0 flex" style={{ background: 'rgba(13,17,23,0.95)', backdropFilter: 'blur(12px)', borderTop: '1px solid #2a3441', paddingBottom: 20, zIndex: 99 }}>
         {[{ id: 'home', icon: '⬡', label: 'Inicio', active: true }, { id: 'explore', icon: '🔍', label: 'Explorar' }, { id: 'history', icon: '📊', label: 'Historial' }, { id: 'profile', icon: '👤', label: 'Perfil' }].map(item => (
