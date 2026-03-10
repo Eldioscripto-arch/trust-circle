@@ -33,6 +33,17 @@ export default function NewCircle() {
     setLoading(true);
     setError('');
     try {
+      // Verificar World ID antes de crear
+      const { MiniKit, VerificationLevel } = await import('@worldcoin/minikit-js');
+      const { finalPayload } = await MiniKit.commandsAsync.verify({
+        action: 'join-circle-v1',
+        signal: wallet,
+        verification_level: VerificationLevel.Orb,
+      });
+      if (finalPayload.status !== 'success') {
+        throw new Error('Debes verificar tu World ID para crear un círculo');
+      }
+
       const res = await fetch('/api/circles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
