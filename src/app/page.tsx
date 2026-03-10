@@ -37,6 +37,7 @@ function Badge({ status }: { status: CircleStatus }) {
 }
 
 function CircleCard({ circle }: { circle: Circle }) {
+  const router = useRouter();
   const progress = circle.status === 'open' ? (circle.members / circle.maxMembers) * 100
     : circle.status === 'pending' ? 87 : 22;
   const barColor = circle.status === 'pending' ? '#e53e3e' : circle.status === 'paid' ? '#38a169' : '#f0b429';
@@ -44,7 +45,7 @@ function CircleCard({ circle }: { circle: Circle }) {
     : circle.status === 'paid' ? `${circle.daysLeft} días restantes` : `${circle.maxMembers - circle.members} slots libres`;
   const timeColor = circle.status === 'pending' ? '#fc8181' : '#718096';
   return (
-    <div className="rounded-2xl p-4 cursor-pointer" style={{ background: '#161b22',
+    <div className="rounded-2xl p-4 cursor-pointer" onClick={() => router.push(`/circles/${circle.id}`)} style={{ background: '#161b22',
       border: `1px solid ${circle.status === 'pending' ? 'rgba(229,62,62,0.4)' : circle.status === 'paid' ? 'rgba(56,161,105,0.3)' : '#2a3441'}`,
       borderTopWidth: 2, borderTopColor: circle.status === 'pending' ? '#e53e3e' : circle.status === 'paid' ? '#38a169' : '#2a3441' }}>
       <div className="flex items-start justify-between mb-3">
