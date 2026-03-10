@@ -4,8 +4,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET() {
   const session = await auth()
-  if (!session?.user?.name) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const wallet = session.user.name.toLowerCase()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const wallet = session.user.id.toLowerCase()
   const { data, error } = await supabaseAdmin
     .from('circle_members')
     .select('circle_id, position, circles(*)')
@@ -16,8 +16,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await auth()
-  if (!session?.user?.name) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const wallet = session.user.name.toLowerCase()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const wallet = session.user.id.toLowerCase()
   const body = await req.json()
   const { name, contributionAmount, cycleDurationSeconds, maxMembers, isPublic } = body
   if (!name || !contributionAmount || !cycleDurationSeconds || !maxMembers)
