@@ -1,9 +1,14 @@
+import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 
 export async function POST() {
-  const uuid = crypto.randomUUID().replace(/-/g, '');
+  const session = await auth();
 
-  // TODO: Store the ID field in your database so you can verify the payment later
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const uuid = crypto.randomUUID().replace(/-/g, '');
 
   return NextResponse.json({ id: uuid });
 }
