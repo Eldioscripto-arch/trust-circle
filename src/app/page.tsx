@@ -76,7 +76,7 @@ function CircleCard({ circle }: { circle: Circle }) {
           </span>
         </div>
         <span className="font-bold text-sm" style={{ color: '#f0b429' }}>
-          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText(window.location.origin+'/circles/'+circle.id);alert('Link copiado');}} style={{cursor:'pointer'}}>{circle.status==='open'?'Invitar →':`$${circle.poolAmount} en pozo`}</span>
+          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText('https://worldcoin.org/mini-app?app_id=app_da9a97ceb52e3ad29b347c4ebfeff06f&path=/circles/'+circle.id);alert('Link copiado');}} style={{cursor:'pointer'}}>{circle.status==='open'?'Invitar →':`$${circle.poolAmount} en pozo`}</span>
         </span>
       </div>
     </div>

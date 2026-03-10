@@ -1,73 +1,71 @@
 'use client';
 import { walletAuth } from '@/auth/wallet';
-import { Button, LiveFeedback } from '@worldcoin/mini-apps-ui-kit-react';
 import { useMiniKit } from '@worldcoin/minikit-js/minikit-provider';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/**
- * This component is an example of how to authenticate a user
- * We will use Next Auth for this example, but you can use any auth provider
- * Read More: https://docs.world.org/mini-apps/commands/wallet-auth
- */
 export const AuthButton = () => {
-  console.log('AuthButton render');
   const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState('');
   const { isInstalled } = useMiniKit();
   const hasAttemptedAuth = useRef(false);
 
-  console.log('AuthButton state:', { isPending, isInstalled });
-
-  const onClick = useCallback(async () => {
-    if (!isInstalled || isPending) {
-      return;
-    }
+  const doAuth = useCallback(async () => {
+    if (!isInstalled || isPending) return;
     setIsPending(true);
+    setError('');
     try {
       await walletAuth();
-    } catch (error) {
-      console.error('Wallet authentication button error', error);
+    } catch (err: any) {
+      console.error('Auth error', err);
+      setError(err?.message || 'Error al autenticar');
     } finally {
       setIsPending(false);
     }
   }, [isInstalled, isPending]);
 
-  // Auto-authenticate on load when MiniKit is ready
+  // Auto-authenticate on load
   useEffect(() => {
-    console.log('AuthButton effect:', {
-      isInstalled,
-      hasAttemptedAuth: hasAttemptedAuth.current,
-    });
     if (isInstalled === true && !hasAttemptedAuth.current) {
-      console.log('Firing walletAuth automatically');
       hasAttemptedAuth.current = true;
-      setIsPending(true);
-      walletAuth()
-        .catch((error) => {
-          console.error('Auto wallet authentication error', error);
-        })
-        .finally(() => {
-          setIsPending(false);
-        });
+      doAuth();
     }
-  }, [isInstalled]);
+  }, [isInstalled, doAuth]);
 
   return (
-    <LiveFeedback
-      label={{
-        failed: 'Failed to login',
-        pending: 'Logging in',
-        success: 'Logged in',
-      }}
-      state={isPending ? 'pending' : undefined}
-    >
-      <Button
-        onClick={onClick}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      {error && (
+        <div style={{
+          background: 'rgba(229,62,62,0.12)',
+          border: '1px solid rgba(229,62,62,0.4)',
+          borderRadius: 12,
+          padding: '12px 16px',
+          fontSize: 13,
+          color: '#fc8181',
+          textAlign: 'center',
+          maxWidth: 280,
+        }}>
+          ⚠️ {error}
+        </div>
+      )}
+      <button
+        onClick={doAuth}
         disabled={isPending}
-        size="lg"
-        variant="primary"
+        style={{
+          background: isPending ? '#a07820' : 'linear-gradient(135deg, #f0b429, #ed8936)',
+          color: '#000',
+          border: 'none',
+          padding: '16px 40px',
+          borderRadius: 16,
+          fontFamily: 'Syne, sans-serif',
+          fontSize: 16,
+          fontWeight: 700,
+          cursor: isPending ? 'not-allowed' : 'pointer',
+          opacity: isPending ? 0.7 : 1,
+          minWidth: 240,
+        }}
       >
-        Login with Wallet
-      </Button>
-    </LiveFeedback>
+        {isPending ? 'Verificando...' : error ? 'Reintentar' : 'Entrar con World ID'}
+      </button>
+    </div>
   );
 };

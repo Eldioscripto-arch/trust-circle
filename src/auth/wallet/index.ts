@@ -1,8 +1,9 @@
-import { MiniKit } from '@worldcoin/minikit-js';
+import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
 import { signIn } from 'next-auth/react';
 import { getNewNonces } from './server-helpers';
 
 export const walletAuth = async () => {
+  // PASO 1 — Wallet auth
   const { nonce, signedNonce } = await getNewNonces();
 
   const result = await MiniKit.commandsAsync.walletAuth({
@@ -18,7 +19,7 @@ export const walletAuth = async () => {
     return;
   }
 
-  // Sin redirectTo — navegamos manualmente después
+  // PASO 2 — Sign in NextAuth
   await signIn('credentials', {
     redirect: false,
     nonce,
@@ -26,6 +27,37 @@ export const walletAuth = async () => {
     finalPayloadJson: JSON.stringify(result.finalPayload),
   });
 
-  // Redirigir manualmente al dashboard
+  const wallet = result.finalPayload.address.toLowerCase();
+
+  // PASO 3 — World ID verify SIEMPRE (biométrico, no depende del dispositivo)
+  const { finalPayload: verifyPayload } = await MiniKit.commandsAsync.verify({
+    action: 'join-circle-v1',
+    signal: wallet,
+    verification_level: VerificationLevel.Orb,
+  });
+
+  if (verifyPayload.status !== 'success') {
+    // Si cancela World ID, no puede entrar
+    throw new Error('World ID verification required to use Trust Circle');
+  }
+
+  // PASO 4 — Guardar verificación en backend
+  const verifyRes = await fetch('/api/verify-world-id', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      wallet,
+      proof: verifyPayload.proof,
+      merkle_root: verifyPayload.merkle_root,
+      nullifier_hash: verifyPayload.nullifier_hash,
+      verification_level: verifyPayload.verification_level,
+    }),
+  });
+
+  if (!verifyRes.ok) {
+    const err = await verifyRes.json();
+    throw new Error(err.error || 'World ID verification failed');
+  }
+
   window.location.href = '/';
 };
