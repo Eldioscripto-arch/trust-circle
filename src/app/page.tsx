@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { AuthButton } from '@/components/AuthButton';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -182,9 +182,15 @@ export default function Home() {
           <h1 className="font-black text-lg" style={{ color: '#f0b429', letterSpacing: -0.5 }}>
             Trust<span style={{ color: '#718096', fontWeight: 400 }}>Circle</span>
           </h1>
-          <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-black"
-            style={{ background: 'linear-gradient(135deg, #f0b429, #ed8936)' }}>
-            {session.user?.name?.slice(2, 4).toUpperCase() || 'TC'}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-black"
+              style={{ background: 'linear-gradient(135deg, #f0b429, #ed8936)' }}>
+              {session.user?.name?.slice(2, 4).toUpperCase() || 'TC'}
+            </div>
+            <button onClick={() => signOut({ callbackUrl: '/' })}
+              style={{ background: 'none', border: 'none', color: '#4a5568', fontSize: 10, cursor: 'pointer', padding: 0 }}>
+              salir
+            </button>
           </div>
         </div>
 
