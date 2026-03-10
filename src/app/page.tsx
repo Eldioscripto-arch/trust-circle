@@ -75,7 +75,7 @@ function CircleCard({ circle }: { circle: Circle }) {
           </span>
         </div>
         <span className="font-bold text-sm" style={{ color: '#f0b429' }}>
-          {circle.status === 'open' ? 'Invitar →' : `$${circle.poolAmount} en pozo`}
+          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText(window.location.origin+'/circles/'+circle.id);alert('Link copiado');}} style={{cursor:'pointer'}}>{circle.status==='open'?'Invitar →':`$${circle.poolAmount} en pozo`}</span>
         </span>
       </div>
     </div>
