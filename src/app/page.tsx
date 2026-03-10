@@ -21,6 +21,7 @@ interface Circle {
   paidCount: number;
   status: CircleStatus;
   poolAmount: number;
+  inviteCode?: string;
 }
 
 function Badge({ status }: { status: CircleStatus }) {
@@ -142,6 +143,7 @@ export default function Home() {
               paidCount: 0,
               status,
               poolAmount: c.member_count * Number(c.contribution_amount),
+              inviteCode: c.invite_code || undefined,
             };
           });
           setCircles(mapped);
