@@ -187,7 +187,7 @@ export default function Home() {
               style={{ background: 'linear-gradient(135deg, #f0b429, #ed8936)' }}>
               {session.user?.name?.slice(2, 4).toUpperCase() || 'TC'}
             </div>
-            <button onClick={() => signOut({ callbackUrl: '/' })}
+            <button onClick={() => { signOut({ redirect: false }).then(() => { window.location.href = '/'; }) }}
               style={{ background: 'none', border: 'none', color: '#4a5568', fontSize: 10, cursor: 'pointer', padding: 0 }}>
               salir
             </button>
