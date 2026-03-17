@@ -254,15 +254,6 @@ export default function Home() {
       <div className="fixed bottom-24 right-5 w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-black font-bold cursor-pointer z-50"
         style={{ background: '#f0b429', boxShadow: '0 4px 24px rgba(240,180,41,0.4)' }} onClick={() => router.push('/circles/new')}>＋</div>
 
-      <div className="fixed bottom-0 left-0 right-0 flex" style={{ background: 'rgba(13,17,23,0.95)', backdropFilter: 'blur(12px)', borderTop: '1px solid #2a3441', paddingBottom: 20, zIndex: 99 }}>
-        {[{ id: 'home', icon: '⬡', label: 'Inicio', active: true }, { id: 'explore', icon: '🔍', label: 'Explorar' }, { id: 'history', icon: '📊', label: 'Historial' }, { id: 'profile', icon: '👤', label: 'Perfil' }].map(item => (
-          <div key={item.id} className="flex-1 flex flex-col items-center gap-1 pt-2.5 relative cursor-pointer">
-            <span style={{ fontSize: 20, opacity: (item as any).active ? 1 : 0.4 }}>{item.icon}</span>
-            <span className="text-xs" style={{ color: (item as any).active ? '#f0b429' : '#4a5568' }}>{item.label}</span>
-          </div>
-        ))}
-      </div>
-
       <style>{`@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }`}</style>
     </>
   );
