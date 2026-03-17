@@ -1,0 +1,41 @@
+name: AIONICA VRF Node
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-vrf-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install web3 eth-account
+
+      - name: Restore last_block
+        uses: actions/cache@v4
+        with:
+          path: vrf/last_block.txt
+          key: vrf-last-block-${{ github.run_id }}
+          restore-keys: vrf-last-block-
+
+      - name: Run VRF node
+        env:
+          WORLD_CHAIN_RPC: ${{ secrets.WORLD_CHAIN_RPC }}
+          VRF_ADDRESS: ${{ secrets.VRF_ADDRESS }}
+          TRUST_CIRCLE_ADDRESS: ${{ secrets.TRUST_CIRCLE_ADDRESS }}
+          VRF_PRIVATE_KEY: ${{ secrets.VRF_PRIVATE_KEY }}
+        run: python vrf/vrf_node.py
+
+      - name: Save last_block
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: vrf/last_block.txt
+          key: vrf-last-block-${{ github.run_id }}
