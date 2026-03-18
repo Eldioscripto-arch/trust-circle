@@ -153,7 +153,7 @@ contract TrustCircle {
     address public constant PERMIT2  = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
     address public constant WORLD_ID = 0x17B354dD2595411ff79041f930e491A4Df39A278;
 
-    string public constant APP_ID     = "app_da9a97ceb52e3ad29b347c4ebfeff06f";
+    string public constant APP_ID     = "app_b17b074c2d88879c13d70df99d77017f";
     string public constant ACTION_JOIN = "join-circle-v1";
 
     // ── Parámetros del protocolo ───────────────────────────
