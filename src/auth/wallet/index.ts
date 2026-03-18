@@ -33,8 +33,9 @@ export const walletAuth = async () => {
   const { finalPayload: verifyPayload } = await MiniKit.commandsAsync.verify({
     action: 'join-circle-v1',
     signal: wallet,
-    verification_level: VerificationLevel.Orb,
-  });
+      verification_level: VerificationLevel.Device,
+      allow_legacy_proofs: true,
+    });
 
   if (verifyPayload.status !== 'success') {
     // Si cancela World ID, no puede entrar
