@@ -13,6 +13,7 @@ import { BottomNav } from '@/components/BottomNav'
 const TRUST_CIRCLE_ADDRESS = '0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf'
 const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1'
 const AIONICO_ADDRESS = '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc'
+const WLD_ADDRESS     = '0x2cFc85d8E48F8EAB294be644d9E25C3030863003'
 
 const JOIN_CIRCLE_ABI = [{ type: 'function', name: 'joinCircle', inputs: [{ name: 'circleId', type: 'uint256' }, { name: 'root', type: 'uint256' }, { name: 'nullifierHash', type: 'uint256' }, { name: 'proof', type: 'uint256[8]' }], outputs: [], stateMutability: 'nonpayable' }]
 const CANCEL_CIRCLE_ABI = [{ type: 'function', name: 'cancelCircle', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
@@ -33,6 +34,7 @@ type Circle = {
   current_cycle?: number
   cycle_start_time?: string
   chain_id?: number
+  token?: string
 }
 
 type Member = {
@@ -181,7 +183,9 @@ export default function CircleDetailPage() {
   async function handleContribute() {
     if (!MiniKit.isInstalled() || !circle) return
     setContributing(true); setError('')
-    const amountRaw = (circle.contribution_amount * 1_000_000).toString()
+    const tokenAddress = circle.token ?? USDC_ADDRESS
+    const tokenDecimals = tokenAddress === USDC_ADDRESS ? 1_000_000 : 1_000_000_000_000_000_000
+    const amountRaw = (circle.contribution_amount * tokenDecimals).toString()
     const nonce     = Date.now().toString()
     const deadline  = Math.floor((Date.now() + 30 * 60 * 1000) / 1000).toString()
     try {
@@ -190,10 +194,10 @@ export default function CircleDetailPage() {
           address:      TRUST_CIRCLE_ADDRESS,
           abi:          (TrustCircleABI as any).abi,
           functionName: 'contribute',
-          args: [id, [[USDC_ADDRESS, amountRaw], nonce, deadline], 'PERMIT2_SIGNATURE_PLACEHOLDER_0'],
+          args: [id, [[tokenAddress, amountRaw], nonce, deadline], 'PERMIT2_SIGNATURE_PLACEHOLDER_0'],
         }],
         permit2: [{
-          permitted: { token: USDC_ADDRESS, amount: amountRaw },
+          permitted: { token: tokenAddress, amount: amountRaw },
           nonce, deadline,
           spender: TRUST_CIRCLE_ADDRESS,
         }],
