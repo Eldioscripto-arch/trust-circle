@@ -76,24 +76,9 @@ function CircleCard({ circle }: { circle: Circle }) {
           </span>
         </div>
         <span className="font-bold text-sm" style={{ color: '#f0b429' }}>
-          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText('https://worldcoin.org/mini-app?app_id=app_b17b074c2d88879c13d70df99d77017f&path=/circles/'+circle.id);alert('Link copiado');}} style={{cursor:'pointer'}}>{circle.status==='open'?'Invitar →':`$${circle.poolAmount} en pozo`}</span>
+          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText('https://worldcoin.org/mini-app?app_id=app_da9a97ceb52e3ad29b347c4ebfeff06f&path=/circles/'+circle.id);alert('Link copiado');}} style={{cursor:'pointer'}}>{circle.status==='open'?'Invitar →':`$${circle.poolAmount} en pozo`}</span>
         </span>
       </div>
-    </div>
-  );
-}
-
-function CelebrationScreen({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center z-50" style={{ background: 'rgba(13,17,23,0.97)' }}>
-      <div className="text-6xl">🎉</div>
-      <p className="mt-5 text-xs uppercase tracking-widest" style={{ color: '#f0b429' }}>¡Recibiste el pozo!</p>
-      <p className="font-black mt-2" style={{ fontSize: 56, letterSpacing: -3, color: '#e2e8f0' }}>
-        <span style={{ fontSize: 24, color: '#2775ca', verticalAlign: 'super' }}>$</span>350.00
-      </p>
-      <p className="text-base mt-1.5" style={{ color: '#718096' }}>Ciclo completado</p>
-      <button onClick={onClose} className="mt-8 px-12 py-4 rounded-2xl font-bold text-black"
-        style={{ background: '#f0b429', fontSize: 15 }}>Ver mi balance ✦</button>
     </div>
   );
 }
@@ -101,7 +86,6 @@ function CelebrationScreen({ onClose }: { onClose: () => void }) {
 export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [showCelebration, setShowCelebration] = useState(false);
   const [circles, setCircles] = useState<Circle[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -175,7 +159,6 @@ export default function Home() {
 
   return (
     <>
-      {showCelebration && <CelebrationScreen onClose={() => setShowCelebration(false)} />}
       <div className="min-h-screen pb-28" style={{ background: '#0d1117' }}>
 
         <div className="flex items-center justify-between px-5 pt-5">
@@ -197,7 +180,7 @@ export default function Home() {
         {pendingCircle && (
           <div className="mx-5 mt-4 rounded-xl border px-4 py-3 flex items-center gap-3 cursor-pointer"
             style={{ background: 'rgba(229,62,62,0.10)', borderColor: 'rgba(229,62,62,0.35)' }}
-            onClick={() => setShowCelebration(true)}>
+            onClick={() => router.push(`/circles/${pendingCircle.id}`)}>
             <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#e53e3e' }} />
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ color: '#fc8181' }}>Pago pendiente hoy</p>
