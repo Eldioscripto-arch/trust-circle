@@ -79,13 +79,26 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await supabaseAdmin.from('circle_members').insert({
+  const { error: memberError } = await supabaseAdmin.from('circle_members').insert({
     circle_id: circle.id,
     wallet,
     position: 0,
   })
 
-  await supabaseAdmin.from('circles').update({ member_count: 1 }).eq('id', circle.id)
+  if (memberError) {
+    await supabaseAdmin.from('circles').delete().eq('id', circle.id)
+    return NextResponse.json({ error: memberError.message }, { status: 500 })
+  }
+
+  const { error: updateError } = await supabaseAdmin
+    .from('circles')
+    .update({ member_count: 1 })
+    .eq('id', circle.id)
+
+  if (updateError) {
+    await supabaseAdmin.from('circles').delete().eq('id', circle.id)
+    return NextResponse.json({ error: updateError.message }, { status: 500 })
+  }
 
   return NextResponse.json({ circle })
 }
