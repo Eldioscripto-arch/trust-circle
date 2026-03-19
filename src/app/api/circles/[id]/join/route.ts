@@ -103,7 +103,7 @@ export async function POST(
   const newCount = circle.member_count + 1
   const newStatus = newCount >= circle.max_members ? 'active' : 'open'
 
-  await supabaseAdmin
+  const { error: updateError } = await supabaseAdmin
     .from('circles')
     .update({
       member_count: newCount,
@@ -111,6 +111,10 @@ export async function POST(
       ...(newStatus === 'active' ? { cycle_start_time: new Date().toISOString() } : {}),
     })
     .eq('id', circleId)
+  if (updateError) {
+    await supabaseAdmin.from('circle_members').delete().eq('circle_id', circleId).eq('wallet', wallet)
+    return NextResponse.json({ error: updateError.message }, { status: 500 })
+  }
 
   await supabaseAdmin.from('reputation_events').insert({
     wallet,
