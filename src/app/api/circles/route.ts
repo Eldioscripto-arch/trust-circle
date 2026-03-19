@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { createPublicClient, http } from 'viem'
+import { worldchain } from 'viem/chains'
+
+const TRUST_CIRCLE_ADDRESS = '0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf'
+const GET_CIRCLE_ABI = [{ type: 'function', name: 'getCircle', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [{ name: 'id', type: 'uint256' }, { name: 'creator', type: 'address' }, { name: 'name', type: 'string' }, { name: 'token', type: 'address' }, { name: 'contributionAmount', type: 'uint256' }, { name: 'cycleDuration', type: 'uint256' }, { name: 'maxMembers', type: 'uint8' }, { name: 'memberCount', type: 'uint8' }, { name: 'currentCycle', type: 'uint8' }, { name: 'cycleStartTime', type: 'uint256' }, { name: 'status', type: 'uint8' }], stateMutability: 'view' }]
+const publicClient = createPublicClient({ chain: worldchain, transport: http('https://worldchain-mainnet.g.alchemy.com/public') })
 
 export async function GET() {
   const session = await auth()
@@ -16,6 +22,21 @@ export async function GET() {
   const enriched = await Promise.all((data ?? []).map(async (item: any) => {
     const c = item.circles
     if (!c || c.status !== 'active') return { ...item, paidCount: 0 }
+
+    // Sincronizar currentCycle y cycleStartTime desde el contrato
+    if (c.chain_id) {
+      try {
+        const onchain = await publicClient.readContract({
+          address: TRUST_CIRCLE_ADDRESS as `0x${string}`,
+          abi: GET_CIRCLE_ABI,
+          functionName: 'getCircle',
+          args: [BigInt(c.chain_id)],
+        }) as any[]
+        c.current_cycle = Number(onchain[8])
+        c.cycle_start_time = new Date(Number(onchain[9]) * 1000).toISOString()
+      } catch {}
+    }
+
     const { count } = await supabaseAdmin
       .from('circle_payments')
       .select('id', { count: 'exact', head: true })
