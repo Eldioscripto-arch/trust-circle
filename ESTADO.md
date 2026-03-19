@@ -1,73 +1,25 @@
 # ESTADO DEL PROYECTO — AIONICA Trust Circle
+Actualizado: Marzo 2026
 
-## LEYENDA
-- ✅ COMPLETO — funciona ahora mismo
-- ⚠️  PENDIENTE — necesita acción antes de funcionar
-- 🔌 LISTO — código armado, solo falta la dirección del contrato
-- 📝 MANUAL — vos tenés que pegar el contenido
+## CONTRATOS DESPLEGADOS — World Chain Mainnet (480)
 
----
+AionicaVRF:          0x1b82bFcE5f96c15086A77e0f98340edE0A287E4B
+TrustCircle:         0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf
+MembershipInsurance: 0xB953016dF10c80496E86E8779697972cC9780094
+MembershipContract:  0x9adCCF3df7170ae5bED7dD17FDb977F866b0f8B3
+AionicoToken:        0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc
 
-## PÁGINAS
+## ESTADO GENERAL
 
-| Página               | Archivo                              | Estado   |
-|----------------------|--------------------------------------|----------|
-| Home                 | src/app/page.tsx                     | ✅       |
-| Crear círculo        | src/app/circles/new/page.tsx         | ✅       |
-| Detalle del círculo  | src/app/circles/[id]/page.tsx        | ✅ / 🔌  |
-| Explorar             | src/app/explore/page.tsx             | ✅       |
-| Historial            | src/app/history/page.tsx             | ✅       |
-| Perfil + Membresía   | src/app/profile/page.tsx             | ✅ / ⚠️  |
-| Guía para usuarios   | src/app/guia/page.tsx                | 📝       |
-| Términos             | src/app/tyc/page.tsx                 | 📝       |
+✅ 5 contratos desplegados
+✅ 9 setters ejecutados
+✅ Frontend conectado
+✅ Membresía L1-L5 activa
+✅ Botón contribuir activo
+✅ Submit for review pendiente en Developer Portal
 
----
+## PENDIENTE
 
-## APIS
-
-| Endpoint                              | Estado | Notas                    |
-|---------------------------------------|--------|--------------------------|
-| GET  /api/circles                     | ✅     |                          |
-| POST /api/circles                     | ✅     |                          |
-| GET  /api/circles/[id]                | ✅     |                          |
-| POST /api/circles/[id]/join           | ✅     |                          |
-| POST /api/circles/[id]/contribute     | ⚠️     | FALTA CREAR              |
-| GET  /api/circles/[id]/payment-status | ⚠️     | FALTA CREAR              |
-| GET  /api/explore                     | ✅     |                          |
-| GET  /api/history                     | ✅     |                          |
-| GET  /api/profile/stats               | ✅     |                          |
-
----
-
-## CONTRATOS — PENDIENTE DE DEPLOY
-
-| Contrato            | Estado                        |
-|---------------------|-------------------------------|
-| AionicaVRF          | ⚠️ Deploy pendiente (paso 1)  |
-| AionicoToken        | ⚠️ Deploy pendiente (paso 2)  |
-| MembershipInsurance | ⚠️ Deploy pendiente (paso 3)  |
-| MembershipContract  | ⚠️ Deploy pendiente (paso 4)  |
-| TrustCircle         | ⚠️ Deploy pendiente (paso 5)  |
-
-Cuando tengas las addresses:
-  nano src/app/circles/[id]/page.tsx
-  Buscar: TRUST_CIRCLE_ADDRESS = ''
-  Pegar la address
-
----
-
-## CONTENIDO PENDIENTE DE PEGAR
-
-  nano src/app/guia/page.tsx   <- pegar texto de guía
-  nano src/app/tyc/page.tsx    <- pegar texto de TyC
-
----
-
-## PRÓXIMOS PASOS
-
-1. npm run dev  <- probar que compila
-2. Pegar textos de TyC y Guía con nano
-3. Conseguir 0.002 ETH -> bridge a World Chain
-4. Deploy de los 5 contratos
-5. Pegar TRUST_CIRCLE_ADDRESS en circles/[id]/page.tsx
-6. Activar botones de membresía en profile/page.tsx
+1. Developer Portal → Contract Entrypoints → poner address TrustCircle
+2. Developer Portal → Submit for review
+3. Pegar textos en nano src/app/guia/page.tsx y src/app/tyc/page.tsx
