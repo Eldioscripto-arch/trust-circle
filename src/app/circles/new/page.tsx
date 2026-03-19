@@ -4,6 +4,25 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
+const TRUST_CIRCLE_ADDRESS = '0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf';
+const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1';
+
+const CREATE_CIRCLE_ABI = [{
+  "type": "function",
+  "name": "createCircle",
+  "inputs": [
+    { "name": "name", "type": "string" },
+    { "name": "token", "type": "address" },
+    { "name": "contributionAmount", "type": "uint256" },
+    { "name": "cycleDuration", "type": "uint256" },
+    { "name": "maxMembers", "type": "uint8" },
+    { "name": "distributionOrder", "type": "address[]" },
+    { "name": "isOpen", "type": "bool" }
+  ],
+  "outputs": [{ "name": "circleId", "type": "uint256" }],
+  "stateMutability": "nonpayable"
+}];
+
 const DURATIONS = [
   { label: '1 semana', seconds: 604800 },
   { label: '2 semanas', seconds: 1209600 },
@@ -20,11 +39,12 @@ export default function NewCircle() {
     duration: 604800,
     maxMembers: 5,
     isPublic: true,
+    isOpen: true,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const wallet = session?.user?.name || '';
+  const wallet = session?.user?.id?.toLowerCase() || '';
   const gross = Number(form.contribution) * form.maxMembers;
   const fee = gross * 0.01;
   const net = gross - fee;
@@ -33,16 +53,29 @@ export default function NewCircle() {
     setLoading(true);
     setError('');
     try {
-      // Verificar World ID antes de crear
-      const { MiniKit, VerificationLevel } = await import('@worldcoin/minikit-js');
-      const { finalPayload } = await MiniKit.commandsAsync.verify({
-        action: 'join-circle-v1',
-        signal: wallet,
-        verification_level: VerificationLevel.Orb,
+      const { MiniKit } = await import('@worldcoin/minikit-js');
+      if (!MiniKit.isInstalled()) throw new Error('Abrí la app desde World App');
+
+      const amountRaw = BigInt(Math.round(Number(form.contribution) * 1_000_000)).toString();
+
+      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+        transaction: [{
+          address: TRUST_CIRCLE_ADDRESS,
+          abi: CREATE_CIRCLE_ABI,
+          functionName: 'createCircle',
+          args: [
+            form.name,
+            USDC_ADDRESS,
+            amountRaw,
+            form.duration.toString(),
+            form.maxMembers,
+            [],
+            form.isOpen,
+          ],
+        }],
       });
-      if (finalPayload.status !== 'success') {
-        throw new Error('Debes verificar tu World ID para crear un círculo');
-      }
+
+      if (finalPayload.status !== 'success') throw new Error('Transacción cancelada');
 
       const res = await fetch('/api/circles', {
         method: 'POST',
@@ -53,10 +86,13 @@ export default function NewCircle() {
           cycleDurationSeconds: form.duration,
           maxMembers: form.maxMembers,
           isPublic: form.isPublic,
+          isOpen: form.isOpen,
+          transaction_id: finalPayload.transaction_id,
         }),
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al crear');
+      if (!res.ok) throw new Error(data.error || 'Error al guardar');
       router.push('/');
     } catch (e: any) {
       setError(e.message);
@@ -65,24 +101,19 @@ export default function NewCircle() {
     }
   }
 
-  if (!session) {
-    router.push('/');
-    return null;
-  }
+  if (!session) { router.push('/'); return null; }
 
   return (
     <div className="min-h-screen pb-10 px-5 pt-5" style={{ background: '#0d1117', color: '#e2e8f0' }}>
 
-      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => step > 1 ? setStep(step - 1) : router.push('/')}
           className="w-9 h-9 rounded-xl flex items-center justify-center"
           style={{ background: '#161b22', border: '1px solid #2a3441' }}>←</button>
-        <h1 className="font-bold text-lg" style={{ color: '#e2e8f0' }}>Nuevo círculo</h1>
+        <h1 className="font-bold text-lg">Nuevo círculo</h1>
         <span className="ml-auto text-xs" style={{ color: '#4a5568' }}>Paso {step} de 2</span>
       </div>
 
-      {/* Progress */}
       <div className="h-1 rounded-full mb-6" style={{ background: '#1c2330' }}>
         <div className="h-full rounded-full transition-all" style={{ width: `${step * 50}%`, background: '#f0b429' }} />
       </div>
@@ -138,6 +169,20 @@ export default function NewCircle() {
           <div className="flex items-center justify-between rounded-xl px-4 py-3"
             style={{ background: '#161b22', border: '1px solid #2a3441' }}>
             <div>
+              <p className="text-sm font-medium">Orden aleatorio (VRF)</p>
+              <p className="text-xs mt-0.5" style={{ color: '#4a5568' }}>Nadie decide el orden — lo sortea el protocolo</p>
+            </div>
+            <div onClick={() => setForm({ ...form, isOpen: !form.isOpen })}
+              className="w-11 h-6 rounded-full cursor-pointer transition-all relative"
+              style={{ background: form.isOpen ? '#f0b429' : '#2a3441' }}>
+              <div className="w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all"
+                style={{ left: form.isOpen ? '22px' : '2px' }} />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl px-4 py-3"
+            style={{ background: '#161b22', border: '1px solid #2a3441' }}>
+            <div>
               <p className="text-sm font-medium">Círculo público</p>
               <p className="text-xs mt-0.5" style={{ color: '#4a5568' }}>Aparece en Explorar</p>
             </div>
@@ -163,13 +208,13 @@ export default function NewCircle() {
         <div className="flex flex-col gap-4">
           <div className="rounded-2xl p-5" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
             <p className="text-xs uppercase tracking-widest mb-4" style={{ color: '#718096' }}>Resumen del círculo</p>
-
             <div className="flex flex-col gap-3">
               {[
                 { label: 'Nombre', value: form.name },
                 { label: 'Contribución', value: `$${form.contribution} USDC/ciclo` },
                 { label: 'Duración', value: DURATIONS.find(d => d.seconds === form.duration)?.label },
                 { label: 'Miembros', value: `${form.maxMembers} personas` },
+                { label: 'Orden', value: form.isOpen ? '🎲 Aleatorio (VRF)' : '📋 Fijo' },
                 { label: 'Visibilidad', value: form.isPublic ? 'Público' : 'Privado' },
               ].map(item => (
                 <div key={item.label} className="flex justify-between">
@@ -178,7 +223,6 @@ export default function NewCircle() {
                 </div>
               ))}
             </div>
-
             <div className="mt-4 pt-4" style={{ borderTop: '1px solid #2a3441' }}>
               <div className="flex justify-between mb-1">
                 <span className="text-sm" style={{ color: '#718096' }}>Pozo total</span>
@@ -204,11 +248,11 @@ export default function NewCircle() {
           <button onClick={handleCreate} disabled={loading}
             className="w-full py-4 rounded-2xl font-bold text-black"
             style={{ background: loading ? '#2a3441' : '#f0b429', color: loading ? '#4a5568' : '#000' }}>
-            {loading ? 'Creando...' : 'Crear círculo ✦'}
+            {loading ? 'Creando on-chain...' : 'Crear círculo ✦'}
           </button>
 
           <p className="text-center text-xs" style={{ color: '#4a5568' }}>
-            El contrato on-chain se despliega cuando el círculo se llena
+            La transacción se firma con tu wallet de World App
           </p>
         </div>
       )}
