@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { createPublicClient, http } from 'viem'
+import { worldchain } from 'viem/chains'
+
+const MEMBERSHIP_ADDRESS = '0xB953016dF10c80496E86E8779697972cC9780094'
+const MEMBERSHIP_ABI = [
+  { type: 'function', name: 'memberships', inputs: [{ name: '', type: 'address' }], outputs: [{ name: 'level', type: 'uint8' }, { name: 'expiresAt', type: 'uint256' }, { name: 'claimedThisYear', type: 'uint256' }, { name: 'yearStart', type: 'uint256' }], stateMutability: 'view' }
+]
+const publicClient = createPublicClient({ chain: worldchain, transport: http('https://worldchain-mainnet.g.alchemy.com/public') })
 
 export async function GET() {
   const session = await auth()
@@ -37,14 +45,22 @@ export async function GET() {
   const score      = Math.max(0, scoreBase - (activeDefaults ?? 0))
   const isEligible = (activeDefaults ?? 0) === 0
 
-  const { data: membership } = await supabaseAdmin
-    .from('memberships')
-    .select('level, expires_at')
-    .eq('wallet', wallet)
-    .gt('expires_at', new Date().toISOString())
-    .maybeSingle()
+  let membership = null
+  try {
+    const result = await publicClient.readContract({
+      address: MEMBERSHIP_ADDRESS as `0x${string}`,
+      abi: MEMBERSHIP_ABI,
+      functionName: 'memberships',
+      args: [wallet as `0x${string}`],
+    }) as [number, bigint, bigint, bigint]
+    const level = result[0]
+    const expiresAt = Number(result[1])
+    if (level > 0 && expiresAt > Math.floor(Date.now() / 1000)) {
+      membership = { level, expires_at: new Date(expiresAt * 1000).toISOString() }
+    }
+  } catch {}
 
   return NextResponse.json({
-    stats: { totalCircles, completedCircles, score, isEligible, membership: membership ?? null }
+    stats: { totalCircles, completedCircles, score, isEligible, membership }
   })
 }
