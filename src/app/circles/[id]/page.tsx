@@ -262,6 +262,15 @@ async function handleCancel() {
       if (finalPayload.status === 'success') {
         setTxAction('distribute')
         setTxId(finalPayload.transaction_id)
+        fetch(`/api/circles/${id}/distribute`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transaction_id: finalPayload.transaction_id,
+            cycle: circle.current_cycle ?? 1,
+            recipient: members[circle.current_cycle ?? 0]?.wallet ?? '',
+          }),
+        }).catch(() => {})
         setSuccess('¡Distribución ejecutada! +50 AIONICO 🎉')
         setDistributing(false)
       } else {
