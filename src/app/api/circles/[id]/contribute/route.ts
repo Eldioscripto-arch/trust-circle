@@ -13,7 +13,7 @@ export async function POST(
 
   const wallet = session.user.id.toLowerCase()
   const { id } = params
-  const { transaction_id } = await req.json()
+  const { transaction_id, cycle } = await req.json()
 
   if (!transaction_id) {
     return NextResponse.json({ error: 'transaction_id required' }, { status: 400 })
@@ -25,7 +25,7 @@ export async function POST(
       circle_id: id,
       wallet,
       transaction_id,
-      cycle: 1,
+      cycle: cycle ?? 1,
       paid_at: new Date().toISOString(),
     })
 

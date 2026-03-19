@@ -13,13 +13,14 @@ export async function GET(
 
   const wallet = session.user.id.toLowerCase()
   const { id } = params
+  const cycle = req.nextUrl.searchParams.get('cycle') ?? '1'
 
   const { data, error } = await supabaseAdmin
     .from('circle_payments')
     .select('id')
     .eq('circle_id', id)
     .eq('wallet', wallet)
-    .eq('cycle', 1)
+    .eq('cycle', Number(cycle))
     .maybeSingle()
 
   if (error) {

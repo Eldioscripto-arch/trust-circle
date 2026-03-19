@@ -103,7 +103,7 @@ export default function CircleDetailPage() {
 
   useEffect(() => {
     if (!wallet || !circle || circle.status !== 'active') return
-    fetch(`/api/circles/${id}/payment-status?wallet=${wallet}`)
+    fetch(`/api/circles/${id}/payment-status?wallet=${wallet}&cycle=${circle.current_cycle ?? 1}`)
       .then(r => r.json())
       .then(d => setHasPaid(d.hasPaid ?? false))
       .catch(() => {})
@@ -193,7 +193,7 @@ export default function CircleDetailPage() {
         await fetch(`/api/circles/${id}/contribute`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ wallet, transaction_id: finalPayload.transaction_id }),
+          body: JSON.stringify({ wallet, transaction_id: finalPayload.transaction_id, cycle: circle.current_cycle ?? 1 }),
         })
       } else {
         setError('Transacción cancelada')
