@@ -38,8 +38,9 @@ function Badge({ status }: { status: CircleStatus }) {
 
 function CircleCard({ circle }: { circle: Circle }) {
   const router = useRouter();
-  const progress = circle.status === 'open' ? (circle.members / circle.maxMembers) * 100
-    : circle.status === 'pending' ? 87 : 22;
+  const progress = circle.status === 'open'
+    ? (circle.members / circle.maxMembers) * 100
+    : circle.members > 0 ? (circle.paidCount / circle.members) * 100 : 0;
   const barColor = circle.status === 'pending' ? '#e53e3e' : circle.status === 'paid' ? '#38a169' : '#f0b429';
   const timeLabel = circle.status === 'pending' ? `${circle.hoursLeft}h restantes`
     : circle.status === 'paid' ? `${circle.daysLeft} días restantes` : `${circle.maxMembers - circle.members} slots libres`;
