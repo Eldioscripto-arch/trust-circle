@@ -8,6 +8,8 @@ import { worldchain } from 'viem/chains';
 
 const TRUST_CIRCLE_ADDRESS = '0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf';
 const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1';
+const WLD_ADDRESS     = '0x2cFc85d8E48F8EAB294be644d9E25C3030863003';
+const AIONICO_ADDRESS = '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc';
 
 const CREATE_CIRCLE_ABI = [{
   "type": "function",
@@ -44,13 +46,14 @@ export default function NewCircle() {
     maxMembers: 5,
     isPublic: true,
     isOpen: true,
+    token: USDC_ADDRESS,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const wallet = session?.user?.id?.toLowerCase() || '';
   const gross = Number(form.contribution) * form.maxMembers;
-  const fee = gross * 0.01;
+  const fee = gross * (form.token === AIONICO_ADDRESS ? 0.005 : 0.01);
   const net = gross - fee;
 
   async function handleCreate() {
@@ -62,7 +65,8 @@ export default function NewCircle() {
 
       const countBefore = await publicClient.readContract({ address: TRUST_CIRCLE_ADDRESS as `0x${string}`, abi: [{ type: 'function', name: 'circleCount', inputs: [], outputs: [{ name: '', type: 'uint256' }], stateMutability: 'view' }], functionName: 'circleCount' });
 
-      const amountRaw = BigInt(Math.round(Number(form.contribution) * 1_000_000)).toString();
+      const tokenDecimals = form.token === USDC_ADDRESS ? 1_000_000 : 1_000_000_000_000_000_000;
+      const amountRaw = BigInt(Math.round(Number(form.contribution) * tokenDecimals)).toString();
 
       const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
         transaction: [{
@@ -71,7 +75,7 @@ export default function NewCircle() {
           functionName: 'createCircle',
           args: [
             form.name,
-            USDC_ADDRESS,
+            form.token,
             amountRaw,
             form.duration.toString(),
             form.maxMembers,
@@ -136,7 +140,25 @@ export default function NewCircle() {
           </div>
 
           <div>
-            <label className="text-xs uppercase tracking-widest mb-2 block" style={{ color: '#718096' }}>Contribución por ciclo (USDC)</label>
+            <label className="text-xs uppercase tracking-widest mb-2 block" style={{ color: '#718096' }}>Token</label>
+            <div className="flex gap-2">
+              {[
+                { label: 'USDC', address: USDC_ADDRESS, color: '#2775ca' },
+                { label: 'WLD',  address: WLD_ADDRESS,  color: '#4a9eff' },
+                { label: 'AIONICO', address: AIONICO_ADDRESS, color: '#f0b429' },
+              ].map(t => (
+                <button key={t.address} onClick={() => setForm({ ...form, token: t.address })}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-medium transition-all"
+                  style={{
+                    background: form.token === t.address ? `rgba(${t.color},0.15)` : '#161b22',
+                    border: `1px solid ${form.token === t.address ? t.color : '#2a3441'}`,
+                    color: form.token === t.address ? t.color : '#718096'
+                  }}>{t.label}</button>
+              ))}
+            </div>
+          </div>
+
+            <label className="text-xs uppercase tracking-widest mb-2 block" style={{ color: '#718096' }}>Contribución por ciclo </label>
             <div className="relative">
               <span className="absolute left-4 top-3 text-sm" style={{ color: '#2775ca' }}>$</span>
               <input type="number" value={form.contribution} onChange={e => setForm({ ...form, contribution: e.target.value })}
@@ -218,7 +240,8 @@ export default function NewCircle() {
             <div className="flex flex-col gap-3">
               {[
                 { label: 'Nombre', value: form.name },
-                { label: 'Contribución', value: `$${form.contribution} USDC/ciclo` },
+                { label: 'Contribución', value: `$${form.contribution} ${form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}/ciclo` },
+                { label: 'Token', value: form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO' },
                 { label: 'Duración', value: DURATIONS.find(d => d.seconds === form.duration)?.label },
                 { label: 'Miembros', value: `${form.maxMembers} personas` },
                 { label: 'Orden', value: form.isOpen ? '🎲 Aleatorio (VRF)' : '📋 Fijo' },
@@ -233,15 +256,15 @@ export default function NewCircle() {
             <div className="mt-4 pt-4" style={{ borderTop: '1px solid #2a3441' }}>
               <div className="flex justify-between mb-1">
                 <span className="text-sm" style={{ color: '#718096' }}>Pozo total</span>
-                <span className="text-sm font-bold" style={{ color: '#f0b429' }}>${gross} USDC</span>
+                <span className="text-sm font-bold" style={{ color: '#f0b429' }}>${gross} {form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}</span>
               </div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm" style={{ color: '#718096' }}>Fee protocolo (1%)</span>
+                <span className="text-sm" style={{ color: '#718096' }}>Fee protocolo ({form.token === AIONICO_ADDRESS ? '0.5%' : '1%'})</span>
                 <span className="text-sm" style={{ color: '#4a5568' }}>-${fee.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm font-bold">Recibes</span>
-                <span className="text-sm font-bold" style={{ color: '#38a169' }}>${net.toFixed(2)} USDC</span>
+                <span className="text-sm font-bold" style={{ color: '#38a169' }}>${net.toFixed(2)} {form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}</span>
               </div>
             </div>
           </div>
