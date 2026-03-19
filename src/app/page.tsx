@@ -125,7 +125,7 @@ export default function Home() {
               totalCycles: c.max_members,
               daysLeft,
               hoursLeft,
-              paidCount: 0,
+              paidCount: item.paidCount ?? 0,
               status,
               poolAmount: c.member_count * Number(c.contribution_amount),
               inviteCode: c.invite_code || undefined,

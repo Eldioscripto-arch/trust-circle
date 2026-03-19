@@ -11,7 +11,20 @@ export async function GET() {
     .select('circle_id, position, circles(*)')
     .eq('wallet', wallet)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ circles: data })
+
+  // Agregar paidCount por círculo activo
+  const enriched = await Promise.all((data ?? []).map(async (item: any) => {
+    const c = item.circles
+    if (!c || c.status !== 'active') return { ...item, paidCount: 0 }
+    const { count } = await supabaseAdmin
+      .from('circle_payments')
+      .select('id', { count: 'exact', head: true })
+      .eq('circle_id', c.id)
+      .eq('cycle', c.current_cycle ?? 1)
+    return { ...item, paidCount: count ?? 0 }
+  }))
+
+  return NextResponse.json({ circles: enriched })
 }
 
 export async function POST(req: NextRequest) {
