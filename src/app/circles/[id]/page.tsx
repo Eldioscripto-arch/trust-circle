@@ -291,8 +291,8 @@ export default function CircleDetailPage() {
             </div>
           ) : (
             <button onClick={handleContribute} disabled={contributing}
-              style={{ width: '100%', background: contributing ? '#2a3441' : TRUST_CIRCLE_ADDRESS ? 'linear-gradient(135deg,#38a169,#2f855a)' : '#1c2330', color: TRUST_CIRCLE_ADDRESS ? '#fff' : '#4a5568', border: `1px solid ${TRUST_CIRCLE_ADDRESS ? 'transparent' : '#2a3441'}`, padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: contributing || !TRUST_CIRCLE_ADDRESS ? 'not-allowed' : 'pointer' }}>
-              {contributing ? (txId ? 'Confirmando on-chain...' : 'Firmando...') : TRUST_CIRCLE_ADDRESS ? `💸 Contribuir $${circle.contribution_amount} USDC` : '⏳ Disponible al lanzar contratos'}
+              style={{ width: '100%', background: contributing ? '#2a3441' : 'linear-gradient(135deg,#38a169,#2f855a)', color: '#fff', border: '1px solid transparent', padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: contributing ? 'not-allowed' : 'pointer' }}>
+              {contributing ? (txId ? 'Confirmando on-chain...' : 'Firmando...') : `💸 Contribuir $${circle.contribution_amount} USDC`}
             </button>
           )
         )}
