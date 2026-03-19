@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { createPublicClient, http } from 'viem';
+import { worldchain } from 'viem/chains';
 
 const TRUST_CIRCLE_ADDRESS = '0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf';
 const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1';
@@ -28,6 +30,8 @@ const DURATIONS = [
   { label: '2 semanas', seconds: 1209600 },
   { label: '1 mes', seconds: 2592000 },
 ];
+
+const publicClient = createPublicClient({ chain: worldchain, transport: http('https://worldchain-mainnet.g.alchemy.com/public') });
 
 export default function NewCircle() {
   const router = useRouter();
@@ -55,6 +59,8 @@ export default function NewCircle() {
     try {
       const { MiniKit } = await import('@worldcoin/minikit-js');
       if (!MiniKit.isInstalled()) throw new Error('Abrí la app desde World App');
+
+      const countBefore = await publicClient.readContract({ address: TRUST_CIRCLE_ADDRESS as `0x${string}`, abi: [{ type: 'function', name: 'circleCount', inputs: [], outputs: [{ name: '', type: 'uint256' }], stateMutability: 'view' }], functionName: 'circleCount' });
 
       const amountRaw = BigInt(Math.round(Number(form.contribution) * 1_000_000)).toString();
 
@@ -87,6 +93,7 @@ export default function NewCircle() {
           maxMembers: form.maxMembers,
           isPublic: form.isPublic,
           isOpen: form.isOpen,
+          chain_id: Number(countBefore) + 1,
           transaction_id: finalPayload.transaction_id,
         }),
       });

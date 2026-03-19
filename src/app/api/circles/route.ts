@@ -19,19 +19,8 @@ export async function POST(req: NextRequest) {
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const wallet = session.user.id.toLowerCase()
 
-  // Verificar que tiene World ID verificado
-  const { data: user } = await supabaseAdmin
-    .from('users')
-    .select('world_id_verified')
-    .eq('wallet_address', wallet)
-    .single()
-
-  if (!user?.world_id_verified) {
-    return NextResponse.json({ error: 'Debes verificar tu World ID para crear círculos' }, { status: 403 })
-  }
-
   const body = await req.json()
-  const { name, contributionAmount, cycleDurationSeconds, maxMembers, isPublic } = body
+  const { name, contributionAmount, cycleDurationSeconds, maxMembers, isPublic, isOpen, chain_id } = body
   if (!name || !contributionAmount || !cycleDurationSeconds || !maxMembers)
     return NextResponse.json({ error: 'Faltan campos' }, { status: 400 })
 
@@ -45,16 +34,17 @@ export async function POST(req: NextRequest) {
       contribution_amount: contributionAmount,
       cycle_duration_seconds: cycleDurationSeconds,
       max_members: maxMembers,
-      is_public: isPublic,
+      is_public: isPublic ?? true,
+      is_open: isOpen ?? true,
       invite_code: inviteCode,
       status: 'open',
+      chain_id: chain_id ?? null,
     })
     .select()
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Agregar creador como miembro posición 0
   await supabaseAdmin.from('circle_members').insert({
     circle_id: circle.id,
     wallet,
