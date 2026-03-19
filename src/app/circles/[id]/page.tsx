@@ -231,8 +231,8 @@ async function handleCancel() {
       if (finalPayload.status === 'success') {
         setTxAction('cancel')
         setTxId(finalPayload.transaction_id)
-        setSuccess('Círculo cancelado correctamente.')
-        setTimeout(() => router.push('/'), 2000)
+        fetch(`/api/circles/${id}/cancel`, { method: 'POST' }).catch(() => {})
+                    setSuccess('Cancelando on-chain...')
       } else {
         setError('Transacción cancelada')
         setCancelling(false)
