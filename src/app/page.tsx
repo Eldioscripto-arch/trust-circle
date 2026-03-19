@@ -215,7 +215,7 @@ export default function Home() {
 
         <div className="flex items-center justify-between px-5 mt-6 mb-3">
           <h2 className="font-bold text-base" style={{ color: '#e2e8f0' }}>Mis círculos</h2>
-          <span className="text-xs cursor-pointer" style={{ color: '#f0b429' }}>Ver todos</span>
+          <span className="text-xs cursor-pointer" style={{ color: '#f0b429' }} onClick={() => router.push('/history')}>Ver historial →</span>
         </div>
 
         <div className="px-5 flex flex-col gap-2.5">
