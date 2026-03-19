@@ -131,9 +131,9 @@ export default function ProfilePage() {
                     style={{ background: '#161b22', border: '1px solid #2a3441' }}>
                     <p className="text-xs" style={{ color: '#4a5568' }}>{item.icon} {item.label}</p>
                     <p className="text-2xl font-black mt-1" style={{ color: item.color }}>{item.value}</p>
-                  </button>
+                  </div>
                 ))}
-              </button>
+              </div>
 
               <div className="rounded-xl p-4" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
                 <p className="text-xs font-semibold mb-3" style={{ color: '#718096' }}>SCORE · POSICIÓN EN CÍRCULOS ABIERTOS</p>
@@ -152,10 +152,10 @@ export default function ProfilePage() {
                       <span className="text-xs font-bold" style={{ color: active ? '#f0b429' : '#4a5568' }}>
                         {active ? '▶ ' : ''}{row.pos}
                       </span>
-                    </button>
+                    </div>
                   );
                 })}
-              </button>
+              </div>
 
               <div className="flex flex-col gap-2">
                 {[
@@ -168,9 +168,9 @@ export default function ProfilePage() {
                     <span>{item.icon}</span>
                     <span className="text-sm flex-1">{item.label}</span>
                     <span style={{ color: '#4a5568' }}>›</span>
-                  </button>
+                  </div>
                 ))}
-              </button>
+              </div>
             </>
           )}
         </div>
