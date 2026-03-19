@@ -15,6 +15,8 @@ const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1'
 const AIONICO_ADDRESS = '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc'
 
 const JOIN_CIRCLE_ABI = [{ type: 'function', name: 'joinCircle', inputs: [{ name: 'circleId', type: 'uint256' }, { name: 'root', type: 'uint256' }, { name: 'nullifierHash', type: 'uint256' }, { name: 'proof', type: 'uint256[8]' }], outputs: [], stateMutability: 'nonpayable' }]
+const CANCEL_CIRCLE_ABI = [{ type: 'function', name: 'cancelCircle', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
+const TRIGGER_DIST_ABI  = [{ type: 'function', name: 'triggerDistribution', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
 
 type Circle = {
   id: string
@@ -64,7 +66,9 @@ export default function CircleDetailPage() {
   const [error,        setError]        = useState('')
   const [success,      setSuccess]      = useState('')
   const [txId,         setTxId]         = useState('')
-
+  const [cancelling,   setCancelling]   = useState(false)
+  const [distributing, setDistributing] = useState(false)
+  const [txAction,     setTxAction]     = useState('')
   const wallet = session?.user?.id?.toLowerCase()
 
   const client = createPublicClient({
@@ -113,6 +117,12 @@ export default function CircleDetailPage() {
   const isFull       = circle ? circle.member_count >= circle.max_members : false
   const canJoin      = !isMember && !isFull && circle?.status === 'open'
   const canContribute = isMember && circle?.status === 'active'
+  const isCreator     = wallet && circle?.creator_wallet?.toLowerCase() === wallet
+  const canCancel     = isCreator && circle?.status === 'open'
+  const cycleEnded    = circle?.status === 'active' && circle?.cycle_start_time
+    ? Date.now() / 1000 > new Date(circle.cycle_start_time).getTime() / 1000 + circle.cycle_duration_seconds
+    : false
+  const canDistribute = isMember && circle?.status === 'active' && cycleEnded
 
   async function handleJoin() {
     if (!MiniKit.isInstalled()) { setError('Abre la app desde World App'); return }
@@ -178,7 +188,7 @@ export default function CircleDetailPage() {
       const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
         transaction: [{
           address:      TRUST_CIRCLE_ADDRESS,
-          abi:          TrustCircleABI,
+          abi:          (TrustCircleABI as any).abi,
           functionName: 'contribute',
           args: [id, [[USDC_ADDRESS, amountRaw], nonce, deadline], 'PERMIT2_SIGNATURE_PLACEHOLDER_0'],
         }],
@@ -202,6 +212,61 @@ export default function CircleDetailPage() {
     } catch (e: any) {
       setError(e.message || 'Error inesperado')
       setContributing(false)
+    }
+  }
+
+async function handleCancel() {
+    if (!MiniKit.isInstalled() || !circle?.chain_id) return
+    if (!confirm('¿Cancelar este círculo? Esta acción es irreversible.')) return
+    setCancelling(true); setError('')
+    try {
+      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+        transaction: [{
+          address:      TRUST_CIRCLE_ADDRESS,
+          abi:          CANCEL_CIRCLE_ABI,
+          functionName: 'cancelCircle',
+          args:         [circle.chain_id.toString()],
+        }],
+      })
+      if (finalPayload.status === 'success') {
+        setTxAction('cancel')
+        setTxId(finalPayload.transaction_id)
+        setSuccess('Círculo cancelado correctamente.')
+        setTimeout(() => router.push('/'), 2000)
+      } else {
+        setError('Transacción cancelada')
+        setCancelling(false)
+      }
+    } catch (e: any) {
+      setError(e.message || 'Error inesperado')
+      setCancelling(false)
+    }
+  }
+
+  async function handleDistribute() {
+    if (!MiniKit.isInstalled() || !circle?.chain_id) return
+    setDistributing(true); setError('')
+    try {
+      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+        transaction: [{
+          address:      TRUST_CIRCLE_ADDRESS,
+          abi:          TRIGGER_DIST_ABI,
+          functionName: 'triggerDistribution',
+          args:         [circle.chain_id.toString()],
+        }],
+      })
+      if (finalPayload.status === 'success') {
+        setTxAction('distribute')
+        setTxId(finalPayload.transaction_id)
+        setSuccess('¡Distribución ejecutada! +50 AIONICO 🎉')
+        setDistributing(false)
+      } else {
+        setError('Transacción cancelada')
+        setDistributing(false)
+      }
+    } catch (e: any) {
+      setError(e.message || 'Error inesperado')
+      setDistributing(false)
     }
   }
 
@@ -298,6 +363,18 @@ export default function CircleDetailPage() {
         )}
         {!isMember && !canJoin && circle.status === 'open' && (
           <div style={{ textAlign: 'center', color: '#718096', fontSize: 14, padding: 14, background: '#161b22', borderRadius: 12, border: '1px solid #2a3441' }}>Este círculo está lleno</div>
+        )}
+        {canDistribute && (
+          <button onClick={handleDistribute} disabled={distributing}
+            style={{ width: '100%', background: distributing ? '#2a3441' : 'linear-gradient(135deg,#3182ce,#2b6cb0)', color: '#fff', border: '1px solid transparent', padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: distributing ? 'not-allowed' : 'pointer' }}>
+            {distributing ? 'Firmando...' : '🏆 Distribuir pozo del ciclo'}
+          </button>
+        )}
+        {canCancel && (
+          <button onClick={handleCancel} disabled={cancelling}
+            style={{ width: '100%', background: 'transparent', color: '#fc8181', border: '1px solid rgba(229,62,62,0.4)', padding: 14, borderRadius: 16, fontSize: 14, fontWeight: 600, cursor: cancelling ? 'not-allowed' : 'pointer' }}>
+            {cancelling ? 'Cancelando...' : '✕ Cancelar círculo'}
+          </button>
         )}
       </div>
 
