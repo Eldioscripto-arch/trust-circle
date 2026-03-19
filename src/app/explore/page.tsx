@@ -15,6 +15,7 @@ interface Circle {
   status: string;
   is_public: boolean;
   created_at: string;
+  token?: string;
 }
 
 function shortWallet(w: string) {
@@ -91,7 +92,7 @@ export default function ExplorePage() {
               </div>
               <div className="grid grid-cols-3 gap-2 mb-3">
                 {[
-                  ['Contribución', `$${c.contribution_amount} USDC`],
+                  ['Contribución', `$${c.contribution_amount} ${c.token === '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1' ? 'USDC' : c.token === '0x2cFc85d8E48F8EAB294be644d9E25C3030863003' ? 'WLD' : 'AIONICO'}`],
                   ['Pozo neto',    `$${net.toFixed(0)}`],
                   ['Ciclo',        formatDuration(c.cycle_duration_seconds)],
                 ].map(([label, value]) => (
