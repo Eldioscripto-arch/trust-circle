@@ -1,0 +1,12 @@
+[
+  {
+    "name": "subscribe",
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "level", "type": "uint8" },
+      { "name": "token", "type": "address" }
+    ],
+    "outputs": []
+  }
+]

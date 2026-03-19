@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
+import { MiniKit } from '@worldcoin/minikit-js';
+import MembershipInsuranceABI from '@/abi/MembershipInsurance.json';
+
+const MEMBERSHIP_INSURANCE_ADDRESS = '0xB953016dF10c80496E86E8779697972cC9780094';
+const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1';
 
 interface Stats {
   totalCircles: number;
@@ -31,6 +36,35 @@ export default function ProfilePage() {
   const [stats,   setStats]   = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab,     setTab]     = useState<'perfil' | 'membresia'>('perfil');
+
+  async function handleSubscribe(level: number, priceUSDC: number) {
+    if (!MiniKit.isInstalled()) { alert('Abrí desde World App'); return; }
+    const amountRaw = (priceUSDC * 1_000_000).toString();
+    const nonce = Date.now().toString();
+    const deadline = Math.floor((Date.now() + 30 * 60 * 1000) / 1000).toString();
+    try {
+      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+        transaction: [{
+          address: MEMBERSHIP_INSURANCE_ADDRESS,
+          abi: MembershipInsuranceABI,
+          functionName: 'subscribe',
+          args: [level, USDC_ADDRESS],
+        }],
+        permit2: [{
+          permitted: { token: USDC_ADDRESS, amount: amountRaw },
+          nonce, deadline,
+          spender: MEMBERSHIP_INSURANCE_ADDRESS,
+        }],
+      });
+      if (finalPayload.status === 'success') {
+        alert('Membresía contratada. Recargá tu perfil.');
+      } else {
+        alert('Transacción cancelada');
+      }
+    } catch (e: any) {
+      alert(e.message || 'Error inesperado');
+    }
+  }
 
   useEffect(() => {
     if (!session) return;
@@ -97,9 +131,9 @@ export default function ProfilePage() {
                     style={{ background: '#161b22', border: '1px solid #2a3441' }}>
                     <p className="text-xs" style={{ color: '#4a5568' }}>{item.icon} {item.label}</p>
                     <p className="text-2xl font-black mt-1" style={{ color: item.color }}>{item.value}</p>
-                  </div>
+                  </button>
                 ))}
-              </div>
+              </button>
 
               <div className="rounded-xl p-4" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
                 <p className="text-xs font-semibold mb-3" style={{ color: '#718096' }}>SCORE · POSICIÓN EN CÍRCULOS ABIERTOS</p>
@@ -118,10 +152,10 @@ export default function ProfilePage() {
                       <span className="text-xs font-bold" style={{ color: active ? '#f0b429' : '#4a5568' }}>
                         {active ? '▶ ' : ''}{row.pos}
                       </span>
-                    </div>
+                    </button>
                   );
                 })}
-              </div>
+              </button>
 
               <div className="flex flex-col gap-2">
                 {[
@@ -134,9 +168,9 @@ export default function ProfilePage() {
                     <span>{item.icon}</span>
                     <span className="text-sm flex-1">{item.label}</span>
                     <span style={{ color: '#4a5568' }}>›</span>
-                  </div>
+                  </button>
                 ))}
-              </div>
+              </button>
             </>
           )}
         </div>
@@ -164,7 +198,7 @@ export default function ProfilePage() {
 
           <p className="text-xs uppercase tracking-widest" style={{ color: '#718096' }}>Niveles disponibles</p>
 
-          {MEMBERSHIP_LEVELS.map(m => (
+{MEMBERSHIP_LEVELS.map(m => (
             <div key={m.level} className="rounded-2xl p-4"
               style={{ background: '#161b22', border: '1px solid #2a3441' }}>
               <div className="flex items-center justify-between mb-3">
@@ -181,10 +215,11 @@ export default function ProfilePage() {
                   <p className="text-xs" style={{ color: '#4a5568' }}>{m.cap}</p>
                 </div>
               </div>
-              <div className="w-full py-2.5 rounded-xl text-sm font-semibold text-center"
-                style={{ background: 'rgba(240,180,41,0.08)', border: '1px solid rgba(240,180,41,0.2)', color: '#718096', cursor: 'not-allowed' }}>
-                Disponible al lanzar contratos
-              </div>
+              <button onClick={() => handleSubscribe(m.level, m.price)}
+                className="w-full py-2.5 rounded-xl text-sm font-semibold"
+                style={{ background: 'linear-gradient(135deg,#f0b429,#ed8936)', color: '#000', cursor: 'pointer', border: 'none' }}>
+                Contratar L{m.level} — ${m.price} USDC/año
+              </button>
             </div>
           ))}
 

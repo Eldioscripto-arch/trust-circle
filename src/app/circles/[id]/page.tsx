@@ -10,8 +10,9 @@ import { worldchain } from 'viem/chains'
 import TrustCircleABI from '@/abi/TrustCircle.json'
 import { BottomNav } from '@/components/BottomNav'
 
-const TRUST_CIRCLE_ADDRESS = ''
+const TRUST_CIRCLE_ADDRESS = '0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf'
 const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1'
+const AIONICO_ADDRESS = '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc'
 
 type Circle = {
   id: string
