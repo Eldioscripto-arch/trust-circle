@@ -14,6 +14,8 @@ const TRUST_CIRCLE_ADDRESS = '0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf'
 const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1'
 const AIONICO_ADDRESS = '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc'
 
+const JOIN_CIRCLE_ABI = [{ type: 'function', name: 'joinCircle', inputs: [{ name: 'circleId', type: 'uint256' }, { name: 'root', type: 'uint256' }, { name: 'nullifierHash', type: 'uint256' }, { name: 'proof', type: 'uint256[8]' }], outputs: [], stateMutability: 'nonpayable' }]
+
 type Circle = {
   id: string
   name: string
@@ -28,6 +30,7 @@ type Circle = {
   created_at: string
   current_cycle?: number
   cycle_start_time?: string
+  chain_id?: number
 }
 
 type Member = {
@@ -114,22 +117,44 @@ export default function CircleDetailPage() {
   async function handleJoin() {
     if (!MiniKit.isInstalled()) { setError('Abre la app desde World App'); return }
     if (!wallet) { setError('Debes iniciar sesión primero'); return }
+    if (!circle?.chain_id) { setError('Este círculo no está registrado on-chain'); return }
     setJoining(true); setError('')
     try {
-      const { finalPayload } = await MiniKit.commandsAsync.verify({
+      const verifyResult = await MiniKit.commandsAsync.verify({
         action: 'join-circle-v1',
         signal: wallet,
         verification_level: VerificationLevel.Orb,
       })
-      if (finalPayload.status === 'error') { setError('Verificación cancelada'); return }
+      if (verifyResult.finalPayload.status === 'error') { setError('Verificación cancelada'); return }
+
+      const vp = verifyResult.finalPayload as any
+      const proofArray = vp.proof as string[]
+
+      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+        transaction: [{
+          address: TRUST_CIRCLE_ADDRESS,
+          abi: JOIN_CIRCLE_ABI,
+          functionName: 'joinCircle',
+          args: [
+            circle.chain_id.toString(),
+            vp.merkle_root,
+            vp.nullifier_hash,
+            proofArray,
+          ],
+        }],
+      })
+
+      if (finalPayload.status !== 'success') { setError('Transacción cancelada'); return }
+
       const res = await fetch(`/api/circles/${id}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          proof:              finalPayload.proof,
-          merkle_root:        finalPayload.merkle_root,
-          nullifier_hash:     finalPayload.nullifier_hash,
-          verification_level: finalPayload.verification_level,
+          proof:              vp.proof,
+          merkle_root:        vp.merkle_root,
+          nullifier_hash:     vp.nullifier_hash,
+          verification_level: vp.verification_level,
+          transaction_id:     finalPayload.transaction_id,
         }),
       })
       const data = await res.json()
@@ -144,10 +169,6 @@ export default function CircleDetailPage() {
   }
 
   async function handleContribute() {
-    if (!TRUST_CIRCLE_ADDRESS) {
-      setError('Los contratos aún no están desplegados. Disponible pronto.')
-      return
-    }
     if (!MiniKit.isInstalled() || !circle) return
     setContributing(true); setError('')
     const amountRaw = (circle.contribution_amount * 1_000_000).toString()
