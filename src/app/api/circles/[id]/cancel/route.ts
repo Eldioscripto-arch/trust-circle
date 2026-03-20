@@ -41,5 +41,8 @@ export async function POST(
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
+  // Limpiar eventos de reputación del círculo cancelado
+  await supabaseAdmin.from('reputation_events').delete().eq('circle_id', id)
+
   return NextResponse.json({ success: true })
 }
