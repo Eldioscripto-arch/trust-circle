@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   const wallet = session.user.id.toLowerCase()
 
   const body = await req.json()
-  const { name, contributionAmount, cycleDurationSeconds, maxMembers, isPublic, isOpen, chain_id } = body
+  const { name, contributionAmount, cycleDurationSeconds, maxMembers, isPublic, isOpen, chain_id, token } = body
   if (!name || !contributionAmount || !cycleDurationSeconds || !maxMembers)
     return NextResponse.json({ error: 'Faltan campos' }, { status: 400 })
 
@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
       invite_code: inviteCode,
       status: 'open',
       chain_id: chain_id ?? null,
+      token: token ?? null,
     })
     .select()
     .single()

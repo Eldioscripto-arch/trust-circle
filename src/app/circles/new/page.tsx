@@ -97,6 +97,7 @@ export default function NewCircle() {
           maxMembers: form.maxMembers,
           isPublic: form.isPublic,
           isOpen: form.isOpen,
+          token: form.token,
           chain_id: Number(countBefore) + 1,
           transaction_id: finalPayload.transaction_id,
         }),
