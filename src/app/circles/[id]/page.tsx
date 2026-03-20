@@ -19,10 +19,10 @@ const JOIN_CIRCLE_ABI = [{ type: 'function', name: 'joinCircle', inputs: [{ name
 const CANCEL_CIRCLE_ABI = [{ type: 'function', name: 'cancelCircle', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
 const TRIGGER_DIST_ABI  = [{ type: 'function', name: 'triggerDistribution', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
 const tokenSymbol = (addr?: string) =>
-const tokenAmt = (addr?: string, amt?: number) =>
-  `${addr?.toLowerCase() === USDC_ADDRESS.toLowerCase() ? '$' : ''}${amt} ${tokenSymbol(addr)}`
   addr?.toLowerCase() === WLD_ADDRESS.toLowerCase() ? 'WLD' :
   addr?.toLowerCase() === AIONICO_ADDRESS.toLowerCase() ? 'AIONICO' : 'USDC'
+const tokenAmt = (addr?: string, amt?: number) =>
+  `${addr?.toLowerCase() === USDC_ADDRESS.toLowerCase() ? '$' : ''}${amt} ${tokenSymbol(addr)}`
 
 type Circle = {
   id: string
