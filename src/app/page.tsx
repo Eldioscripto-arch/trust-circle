@@ -52,7 +52,7 @@ function CircleCard({ circle }: { circle: Circle }) {
       <div className="flex items-start justify-between mb-3">
         <div>
           <p className="font-bold text-sm" style={{ color: '#e2e8f0' }}>{circle.name}</p>
-          <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{circle.members}/{circle.maxMembers} miembros · ${circle.contribution} USDC/ciclo</p>
+          <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{circle.members}/{circle.maxMembers} miembros · ${circle.currency === 'USDC' ? '$' : ''}${circle.contribution} ${circle.currency}/ciclo</p>
         </div>
         <Badge status={circle.status} />
       </div>
@@ -121,7 +121,7 @@ export default function Home() {
               members: c.member_count,
               maxMembers: c.max_members,
               contribution: Number(c.contribution_amount),
-              currency: 'USDC',
+              currency: c.token === '0x2cFc85d8E48F8EAB294be644d9E25C3030863003' ? 'WLD' : c.token === '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc' ? 'AIONICO' : 'USDC',
               cycle: c.current_cycle,
               totalCycles: c.max_members,
               daysLeft,
@@ -194,7 +194,7 @@ if (!session) {
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ color: '#fc8181' }}>Pago pendiente hoy</p>
               <p className="text-xs mt-0.5" style={{ color: 'rgba(252,129,129,0.7)' }}>
-                {pendingCircle.name} · cierra en {pendingCircle.hoursLeft}h · ${pendingCircle.contribution} USDC
+                {pendingCircle.name} · cierra en {pendingCircle.hoursLeft}h · ${pendingCircle.currency === 'USDC' ? '$' : ''}${pendingCircle.contribution} ${pendingCircle.currency}
               </p>
             </div>
             <span style={{ color: '#fc8181', fontSize: 18 }}>›</span>
