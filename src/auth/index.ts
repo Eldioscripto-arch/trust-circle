@@ -47,7 +47,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signedNonce: string;
         finalPayloadJson: string;
       }) => {
-        const expectedSignedNonce = hashNonce({ nonce });
+        const expectedSignedNonce = await hashNonce({ nonce });
 
         if (signedNonce !== expectedSignedNonce) {
           console.log('Invalid signed nonce');
