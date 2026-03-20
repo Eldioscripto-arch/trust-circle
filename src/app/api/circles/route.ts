@@ -16,6 +16,7 @@ export async function GET() {
     .from('circle_members')
     .select('circle_id, position, circles(*)')
     .eq('wallet', wallet)
+    .neq('circles.status', 'cancelled')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Agregar paidCount por círculo activo

@@ -322,8 +322,8 @@ async function handleCancel() {
             <div style={{ fontFamily: 'Syne,sans-serif', fontSize: 20, fontWeight: 800 }}>{circle.name}</div>
             <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>por {shortWallet(circle.creator_wallet)}</div>
           </div>
-          <div style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: circle.status === 'open' ? 'rgba(240,180,41,0.15)' : circle.status === 'active' ? 'rgba(56,161,105,0.15)' : 'rgba(99,179,237,0.15)', color: circle.status === 'open' ? '#f0b429' : circle.status === 'active' ? '#68d391' : '#63b3ed' }}>
-            {circle.status === 'open' ? 'Abierto' : circle.status === 'active' ? 'Activo' : 'Completado'}
+          <div style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: circle.status === 'open' ? 'rgba(240,180,41,0.15)' : circle.status === 'active' ? 'rgba(56,161,105,0.15)' : circle.status === 'cancelled' ? 'rgba(229,62,62,0.15)' : 'rgba(99,179,237,0.15)', color: circle.status === 'open' ? '#f0b429' : circle.status === 'active' ? '#68d391' : circle.status === 'cancelled' ? '#fc8181' : '#63b3ed' }}>
+            {circle.status === 'open' ? 'Abierto' : circle.status === 'active' ? 'Activo' : circle.status === 'cancelled' ? 'Cancelado' : 'Completado'}
           </div>
         </div>
 
