@@ -158,6 +158,7 @@ export default function NewCircle() {
             </div>
           </div>
 
+          <div>
             <label className="text-xs uppercase tracking-widest mb-2 block" style={{ color: '#718096' }}>Contribución por ciclo </label>
             <div className="relative">
               <span className="absolute left-4 top-3 text-sm" style={{ color: '#2775ca' }}>$</span>
