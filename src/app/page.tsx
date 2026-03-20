@@ -140,7 +140,7 @@ export default function Home() {
   }, [session]);
 
   const totalsByToken = circles.reduce((acc: Record<string, number>, c) => { acc[c.currency] = (acc[c.currency] ?? 0) + c.poolAmount; return acc; }, {});
-  const activeCount = circles.filter(c => c.status !== 'open').length;
+  const activeCount = circles.filter(c => c.status !== 'completed').length;
   const pendingCircle = circles.find(c => c.status === 'pending');
 
   if (status === 'loading') {
