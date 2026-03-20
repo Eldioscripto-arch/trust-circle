@@ -85,7 +85,7 @@ function CircleCard({ circle }: { circle: Circle }) {
 }
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [circles, setCircles] = useState<Circle[]>([]);
   const [loading, setLoading] = useState(false);
@@ -143,7 +143,15 @@ export default function Home() {
   const activeCount = circles.filter(c => c.status !== 'open').length;
   const pendingCircle = circles.find(c => c.status === 'pending');
 
-  if (!session) {
+  if (status === 'loading') {
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d1117' }}>
+      <p style={{ color: '#4a5568' }}>Cargando...</p>
+    </div>
+  );
+}
+
+if (!session) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-8" style={{ background: '#0d1117' }}>
         <div className="text-center">
