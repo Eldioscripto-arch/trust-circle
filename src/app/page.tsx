@@ -139,7 +139,7 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, [session]);
 
-  const totalSaved = circles.reduce((sum, c) => sum + c.poolAmount, 0);
+  const totalsByToken = circles.reduce((acc: Record<string, number>, c) => { acc[c.currency] = (acc[c.currency] ?? 0) + c.poolAmount; return acc; }, {});
   const activeCount = circles.filter(c => c.status !== 'open').length;
   const pendingCircle = circles.find(c => c.status === 'pending');
 
@@ -204,10 +204,21 @@ if (!session) {
         <div className="mx-5 mt-4 rounded-2xl p-6" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
           <p className="text-xs uppercase tracking-widest" style={{ color: '#718096' }}>Total en círculos</p>
           <div className="mt-2 leading-none">
-            <span className="text-lg font-semibold align-super" style={{ color: '#2775ca' }}>$</span>
-            <span className="font-black" style={{ fontSize: 42, letterSpacing: -2, color: '#e2e8f0' }}>
-              {loading ? '...' : totalSaved.toLocaleString()}
-            </span>
+            {loading ? (
+              <span className="font-black" style={{ fontSize: 42, letterSpacing: -2, color: '#e2e8f0' }}>...</span>
+            ) : Object.keys(totalsByToken).length === 0 ? (
+              <span className="font-black" style={{ fontSize: 42, letterSpacing: -2, color: '#e2e8f0' }}>0</span>
+            ) : (
+              <div className="flex flex-col gap-1">
+                {Object.entries(totalsByToken).map(([token, amount]) => (
+                  <div key={token} className="flex items-baseline gap-1">
+                    {token === 'USDC' && <span className="text-lg font-semibold align-super" style={{ color: '#2775ca' }}>$</span>}
+                    <span className="font-black" style={{ fontSize: 36, letterSpacing: -2, color: '#e2e8f0' }}>{(amount as number).toLocaleString()}</span>
+                    <span className="text-lg font-semibold" style={{ color: '#718096' }}>{token}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="mt-4 flex gap-5">
             <div className="flex flex-col gap-0.5">
