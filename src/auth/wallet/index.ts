@@ -20,12 +20,16 @@ export const walletAuth = async () => {
   }
 
   // PASO 2 — Sign in NextAuth
-  await signIn('credentials', {
+  const signInResult = await signIn('credentials', {
     redirect: false,
     nonce,
     signedNonce,
     finalPayloadJson: JSON.stringify(result.finalPayload),
   });
+
+  if (!signInResult || signInResult.error) {
+    throw new Error(`SignIn falló: ${signInResult?.error || 'sin respuesta'}`);
+  }
 
   const wallet = result.finalPayload.address.toLowerCase();
 
