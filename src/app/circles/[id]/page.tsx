@@ -13,11 +13,14 @@ import { BottomNav } from '@/components/BottomNav'
 const TRUST_CIRCLE_ADDRESS = '0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf'
 const USDC_ADDRESS = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1'
 const AIONICO_ADDRESS = '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc'
-const WLD_ADDRESS     = '0x2cFc85d8E48F8EAB294be644d9E25C3030863003'
+const WLD_ADDRESS = '0x2cFc85d8E48F8EAB294be644d9E25C3030863003'
 
 const JOIN_CIRCLE_ABI = [{ type: 'function', name: 'joinCircle', inputs: [{ name: 'circleId', type: 'uint256' }, { name: 'root', type: 'uint256' }, { name: 'nullifierHash', type: 'uint256' }, { name: 'proof', type: 'uint256[8]' }], outputs: [], stateMutability: 'nonpayable' }]
 const CANCEL_CIRCLE_ABI = [{ type: 'function', name: 'cancelCircle', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
 const TRIGGER_DIST_ABI  = [{ type: 'function', name: 'triggerDistribution', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
+const tokenSymbol = (addr?: string) =>
+  addr?.toLowerCase() === WLD_ADDRESS.toLowerCase() ? 'WLD' :
+  addr?.toLowerCase() === AIONICO_ADDRESS.toLowerCase() ? 'AIONICO' : 'USDC'
 
 type Circle = {
   id: string
@@ -324,7 +327,7 @@ async function handleCancel() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
           {[
-            ['Contribución', `$${circle.contribution_amount} USDC`, '#e2e8f0'],
+            ['Contribución', `$${circle.contribution_amount} ${tokenSymbol(circle.token)}`, '#e2e8f0'],
             ['Duración ciclo', formatDuration(circle.cycle_duration_seconds), '#e2e8f0'],
             ['Pozo neto', `$${net.toFixed(2)}`, '#f0b429'],
             ['Fee protocolo', `$${fee.toFixed(2)} (1%)`, '#e2e8f0'],
@@ -370,7 +373,7 @@ async function handleCancel() {
           ) : (
             <button onClick={handleContribute} disabled={contributing}
               style={{ width: '100%', background: contributing ? '#2a3441' : 'linear-gradient(135deg,#38a169,#2f855a)', color: '#fff', border: '1px solid transparent', padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: contributing ? 'not-allowed' : 'pointer' }}>
-              {contributing ? (txId ? 'Confirmando on-chain...' : 'Firmando...') : `💸 Contribuir $${circle.contribution_amount} USDC`}
+              {contributing ? (txId ? 'Confirmando on-chain...' : 'Firmando...') : `💸 Contribuir $${circle.contribution_amount} ${tokenSymbol(circle.token)}`}
             </button>
           )
         )}
