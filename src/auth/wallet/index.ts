@@ -37,7 +37,7 @@ export const walletAuth = async () => {
   const { finalPayload: verifyPayload } = await MiniKit.commandsAsync.verify({
     action: 'join-circle-v1',
     signal: wallet,
-      verification_level: VerificationLevel.Device,
+      verification_level: VerificationLevel.Orb,
       allow_legacy_proofs: true,
     });
 
