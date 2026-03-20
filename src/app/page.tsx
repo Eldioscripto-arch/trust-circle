@@ -52,7 +52,7 @@ function CircleCard({ circle }: { circle: Circle }) {
       <div className="flex items-start justify-between mb-3">
         <div>
           <p className="font-bold text-sm" style={{ color: '#e2e8f0' }}>{circle.name}</p>
-          <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{circle.members}/{circle.maxMembers} miembros · ${circle.currency === 'USDC' ? '$' : ''}${circle.contribution} ${circle.currency}/ciclo</p>
+          <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{circle.members}/{circle.maxMembers} miembros · {circle.currency === 'USDC' ? '$' : ''}{circle.contribution} {circle.currency}/ciclo</p>
         </div>
         <Badge status={circle.status} />
       </div>
@@ -194,7 +194,7 @@ if (!session) {
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ color: '#fc8181' }}>Pago pendiente hoy</p>
               <p className="text-xs mt-0.5" style={{ color: 'rgba(252,129,129,0.7)' }}>
-                {pendingCircle.name} · cierra en {pendingCircle.hoursLeft}h · ${pendingCircle.currency === 'USDC' ? '$' : ''}${pendingCircle.contribution} ${pendingCircle.currency}
+                {pendingCircle.name} · cierra en {pendingCircle.hoursLeft}h · {pendingCircle.currency === 'USDC' ? '$' : ''}{pendingCircle.contribution} {pendingCircle.currency}
               </p>
             </div>
             <span style={{ color: '#fc8181', fontSize: 18 }}>›</span>

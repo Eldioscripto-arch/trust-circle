@@ -258,15 +258,15 @@ export default function NewCircle() {
             <div className="mt-4 pt-4" style={{ borderTop: '1px solid #2a3441' }}>
               <div className="flex justify-between mb-1">
                 <span className="text-sm" style={{ color: '#718096' }}>Pozo total</span>
-                <span className="text-sm font-bold" style={{ color: '#f0b429' }}>${gross} {form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}</span>
+                <span className="text-sm font-bold" style={{ color: '#f0b429' }}>{form.token === USDC_ADDRESS ? '$' : ''}{gross} {form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}</span>
               </div>
               <div className="flex justify-between mb-1">
                 <span className="text-sm" style={{ color: '#718096' }}>Fee protocolo ({form.token === AIONICO_ADDRESS ? '0.5%' : '1%'})</span>
-                <span className="text-sm" style={{ color: '#4a5568' }}>-${fee.toFixed(2)}</span>
+                <span className="text-sm" style={{ color: '#4a5568' }}>-{form.token === USDC_ADDRESS ? '$' : ''}{fee.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm font-bold">Recibes</span>
-                <span className="text-sm font-bold" style={{ color: '#38a169' }}>${net.toFixed(2)} {form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}</span>
+                <span className="text-sm font-bold" style={{ color: '#38a169' }}>{form.token === USDC_ADDRESS ? '$' : ''}{net.toFixed(2)} {form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}</span>
               </div>
             </div>
           </div>
