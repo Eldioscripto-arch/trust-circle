@@ -16,7 +16,7 @@ export async function POST(
 
   const { data: circle, error } = await supabaseAdmin
     .from('circles')
-    .select('creator_wallet, status')
+    .select('creator_wallet, status, member_count')
     .eq('id', id)
     .single()
 
@@ -26,6 +26,10 @@ export async function POST(
 
   if (circle.creator_wallet.toLowerCase() !== wallet) {
     return NextResponse.json({ error: 'Solo el creador puede cancelar' }, { status: 403 })
+  }
+
+  if (circle.member_count > 1) {
+    return NextResponse.json({ error: 'No puedes cancelar un círculo con miembros activos' }, { status: 400 })
   }
 
   if (circle.status !== 'open') {

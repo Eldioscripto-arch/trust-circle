@@ -9,10 +9,10 @@ export async function GET() {
   const wallet = session.user.id.toLowerCase()
 
   const { data, error } = await supabaseAdmin
-    .from('reputation_events')
-    .select('id, circle_id, event_type, created_at, circles(name)')
+    .from('circle_members')
+    .select('circle_id, position, joined_at, circles(name, status, contribution_amount, token, max_members)')
     .eq('wallet', wallet)
-    .order('created_at', { ascending: false })
+    .order('joined_at', { ascending: false })
     .limit(100)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

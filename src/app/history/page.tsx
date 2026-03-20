@@ -5,11 +5,10 @@ import { useSession } from 'next-auth/react';
 import { BottomNav } from '@/components/BottomNav';
 
 interface Event {
-  id: string;
   circle_id: string;
-  event_type: string;
-  created_at: string;
-  circles?: { name: string };
+  position: number;
+  joined_at: string;
+  circles?: { name: string; status: string; contribution_amount: number; token: string; max_members: number };
 }
 
 const EVENT_LABELS: Record<string, { icon: string; label: string; color: string }> = {
@@ -56,23 +55,28 @@ export default function HistoryPage() {
       )}
 
       <div className="flex flex-col gap-2">
-        {events.map(ev => {
-          const cfg = EVENT_LABELS[ev.event_type] ?? { icon: '•', label: ev.event_type, color: '#718096' };
-          return (
-            <div key={ev.id} className="flex items-center gap-3 rounded-xl px-4 py-3"
-              style={{ background: '#161b22', border: '1px solid #2a3441' }}>
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                style={{ background: '#1c2330' }}>{cfg.icon}</div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium" style={{ color: cfg.color }}>{cfg.label}</p>
-                {ev.circles?.name && (
-                  <p className="text-xs mt-0.5 truncate" style={{ color: '#718096' }}>{ev.circles.name}</p>
-                )}
+          {events.map((ev, i) => {
+            const status = ev.circles?.status ?? 'open';
+            const cfg = status === 'cancelled' 
+              ? { icon: '❌', label: 'Cancelado', color: '#fc8181' }
+              : status === 'active' 
+              ? { icon: '💸', label: 'Activo', color: '#68d391' }
+              : status === 'completed'
+              ? { icon: '✅', label: 'Completado', color: '#f0b429' }
+              : { icon: '🤝', label: 'Abierto', color: '#63b3ed' };
+            return (
+              <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3"
+                style={{ background: '#161b22', border: '1px solid #2a3441' }}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                  style={{ background: '#1c2330' }}>{cfg.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium" style={{ color: cfg.color }}>{ev.circles?.name ?? 'Círculo'}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{cfg.label} · Turno #{ev.position + 1}</p>
+                </div>
+                <p className="text-xs flex-shrink-0" style={{ color: '#4a5568' }}>{formatDate(ev.joined_at)}</p>
               </div>
-              <p className="text-xs flex-shrink-0" style={{ color: '#4a5568' }}>{formatDate(ev.created_at)}</p>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       <BottomNav />
