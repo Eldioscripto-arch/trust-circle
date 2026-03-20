@@ -151,7 +151,7 @@ export default function NewCircle() {
                 <button key={t.address} onClick={() => setForm({ ...form, token: t.address })}
                   className="flex-1 py-2.5 rounded-xl text-xs font-medium transition-all"
                   style={{
-                    background: form.token === t.address ? `rgba(${t.color},0.15)` : '#161b22',
+                    background: form.token === t.address ? '#1c2330' : '#161b22',
                     border: `1px solid ${form.token === t.address ? t.color : '#2a3441'}`,
                     color: form.token === t.address ? t.color : '#718096'
                   }}>{t.label}</button>
@@ -162,7 +162,7 @@ export default function NewCircle() {
           <div>
             <label className="text-xs uppercase tracking-widest mb-2 block" style={{ color: '#718096' }}>Contribución por ciclo </label>
             <div className="relative">
-              <span className="absolute left-4 top-3 text-sm" style={{ color: '#2775ca' }}>$</span>
+              <span className="absolute left-4 top-3 text-sm" style={{ color: form.token === USDC_ADDRESS ? '#2775ca' : 'transparent' }}>$</span>
               <input type="number" value={form.contribution} onChange={e => setForm({ ...form, contribution: e.target.value })}
                 placeholder="50"
                 className="w-full rounded-xl pl-8 pr-4 py-3 text-sm outline-none"
