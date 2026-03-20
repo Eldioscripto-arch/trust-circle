@@ -331,8 +331,8 @@ async function handleCancel() {
           {[
             ['Contribución', tokenAmt(circle.token, circle.contribution_amount), '#e2e8f0'],
             ['Duración ciclo', formatDuration(circle.cycle_duration_seconds), '#e2e8f0'],
-            ['Pozo neto', `$${net.toFixed(2)}`, '#f0b429'],
-            ['Fee protocolo', `$${fee.toFixed(2)} (1%)`, '#e2e8f0'],
+            ['Pozo neto', tokenAmt(circle.token, net), '#f0b429'],
+            ['Fee protocolo', `${tokenAmt(circle.token, fee)} (1%)`, '#e2e8f0'],
           ].map(([label, value, color]) => (
             <div key={label} style={{ background: '#1c2330', borderRadius: 12, padding: '10px 12px' }}>
               <div style={{ fontSize: 10, color: '#718096', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
