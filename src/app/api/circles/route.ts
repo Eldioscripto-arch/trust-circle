@@ -16,7 +16,6 @@ export async function GET() {
     .from('circle_members')
     .select('circle_id, position, circles(*)')
     .eq('wallet', wallet)
-    .neq('circles.status', 'cancelled')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Agregar paidCount por círculo activo
@@ -46,7 +45,8 @@ export async function GET() {
     return { ...item, paidCount: count ?? 0 }
   }))
 
-  return NextResponse.json({ circles: enriched })
+  const filtered = enriched.filter((item: any) => item.circles?.status !== 'cancelled')
+  return NextResponse.json({ circles: filtered })
 }
 
 export async function POST(req: NextRequest) {
