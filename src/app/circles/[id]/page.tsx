@@ -19,6 +19,8 @@ const JOIN_CIRCLE_ABI = [{ type: 'function', name: 'joinCircle', inputs: [{ name
 const CANCEL_CIRCLE_ABI = [{ type: 'function', name: 'cancelCircle', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
 const TRIGGER_DIST_ABI  = [{ type: 'function', name: 'triggerDistribution', inputs: [{ name: 'circleId', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }]
 const tokenSymbol = (addr?: string) =>
+const tokenAmt = (addr?: string, amt?: number) =>
+  `${addr?.toLowerCase() === USDC_ADDRESS.toLowerCase() ? '$' : ''}${amt} ${tokenSymbol(addr)}`
   addr?.toLowerCase() === WLD_ADDRESS.toLowerCase() ? 'WLD' :
   addr?.toLowerCase() === AIONICO_ADDRESS.toLowerCase() ? 'AIONICO' : 'USDC'
 
@@ -327,7 +329,7 @@ async function handleCancel() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
           {[
-            ['Contribución', `$${circle.contribution_amount} ${tokenSymbol(circle.token)}`, '#e2e8f0'],
+            ['Contribución', tokenAmt(circle.token, circle.contribution_amount), '#e2e8f0'],
             ['Duración ciclo', formatDuration(circle.cycle_duration_seconds), '#e2e8f0'],
             ['Pozo neto', `$${net.toFixed(2)}`, '#f0b429'],
             ['Fee protocolo', `$${fee.toFixed(2)} (1%)`, '#e2e8f0'],
@@ -373,7 +375,7 @@ async function handleCancel() {
           ) : (
             <button onClick={handleContribute} disabled={contributing}
               style={{ width: '100%', background: contributing ? '#2a3441' : 'linear-gradient(135deg,#38a169,#2f855a)', color: '#fff', border: '1px solid transparent', padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: contributing ? 'not-allowed' : 'pointer' }}>
-              {contributing ? (txId ? 'Confirmando on-chain...' : 'Firmando...') : `💸 Contribuir $${circle.contribution_amount} ${tokenSymbol(circle.token)}`}
+              {contributing ? (txId ? 'Confirmando on-chain...' : 'Firmando...') : `💸 Contribuir ${tokenAmt(circle.token, circle.contribution_amount)}`}
             </button>
           )
         )}

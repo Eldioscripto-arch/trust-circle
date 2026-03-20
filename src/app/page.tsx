@@ -77,7 +77,7 @@ function CircleCard({ circle }: { circle: Circle }) {
           </span>
         </div>
         <span className="font-bold text-sm" style={{ color: '#f0b429' }}>
-          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText('https://worldcoin.org/mini-app?app_id=app_da9a97ceb52e3ad29b347c4ebfeff06f&path=/circles/'+circle.id);alert('Link copiado');}} style={{cursor:'pointer'}}>{circle.status==='open'?'Invitar →':`$${circle.poolAmount} en pozo`}</span>
+          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText('https://worldcoin.org/mini-app?app_id=app_da9a97ceb52e3ad29b347c4ebfeff06f&path=/circles/'+circle.id);alert('Link copiado');}} style={{cursor:'pointer'}}>{circle.status==='open'?'Invitar →':circle.token === '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1' ? `$${circle.poolAmount} USDC en pozo` : `${circle.poolAmount} ${circle.token === '0x2cFc85d8E48F8EAB294be644d9E25C3030863003' ? 'WLD' : 'AIONICO'} en pozo`}</span>
         </span>
       </div>
     </div>

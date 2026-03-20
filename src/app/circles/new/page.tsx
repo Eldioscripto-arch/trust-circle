@@ -242,7 +242,7 @@ export default function NewCircle() {
             <div className="flex flex-col gap-3">
               {[
                 { label: 'Nombre', value: form.name },
-                { label: 'Contribución', value: `$${form.contribution} ${form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}/ciclo` },
+                { label: 'Contribución', value: `${form.token === USDC_ADDRESS ? '$' : ''}${form.contribution} ${form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO'}/ciclo` },
                 { label: 'Token', value: form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO' },
                 { label: 'Duración', value: DURATIONS.find(d => d.seconds === form.duration)?.label },
                 { label: 'Miembros', value: `${form.maxMembers} personas` },
