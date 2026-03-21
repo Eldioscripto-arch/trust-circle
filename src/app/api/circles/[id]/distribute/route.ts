@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { rateLimit } from '@/lib/rate-limit'
+import { createPublicClient, http } from 'viem'
+import { worldchain } from 'viem/chains'
+
+const publicClient = createPublicClient({
+  chain: worldchain,
+  transport: http('https://worldchain-mainnet.g.alchemy.com/public')
+})
 
 export async function POST(
   req: NextRequest,
@@ -23,6 +30,18 @@ export async function POST(
 
   if (!transaction_id) {
     return NextResponse.json({ error: 'transaction_id required' }, { status: 400 })
+  }
+
+  // Verificar tx on-chain
+  try {
+    const receipt = await publicClient.getTransactionReceipt({
+      hash: transaction_id as `0x${string}`
+    })
+    if (!receipt || receipt.status !== 'success') {
+      return NextResponse.json({ error: 'Transacción no confirmada on-chain' }, { status: 400 })
+    }
+  } catch {
+    return NextResponse.json({ error: 'No se pudo verificar la transacción' }, { status: 400 })
   }
 
   await supabaseAdmin.from('reputation_events').insert([
