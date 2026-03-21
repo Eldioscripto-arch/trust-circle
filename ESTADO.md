@@ -30,6 +30,9 @@ AionicoToken:        0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc
 ✅ TyC v3 + Guía v1.0 pegados en frontend
 ✅ Callchain verificado frontend ↔ contratos
 
+## CHECKPOINT — VOLVER A ESTADO FUNCIONAL
+git checkout b03b437
+
 ## GAP IDENTIFICADO — PENDIENTE IMPLEMENTAR
 
 ⏳ settleDebt() — usuario moroso no puede rehabilitarse desde la UI
