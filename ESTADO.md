@@ -35,7 +35,7 @@ git checkout b03b437
 
 ## GAP IDENTIFICADO — PENDIENTE IMPLEMENTAR
 
-⏳ settleDebt() — usuario moroso no puede rehabilitarse desde la UI
+✅ settleDebt() — card deuda + botón rehabilitación implementados (commit cce760e)
 
 Pasos para cerrar el gap:
 1. Crear src/abi/MembershipContract.json (totalDebt + settleDebt)
