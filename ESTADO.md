@@ -1,5 +1,5 @@
 # ESTADO DEL PROYECTO — AIONICA Trust Circle
-Actualizado: Marzo 2026
+Actualizado: 21 Marzo 2026
 
 ## CONTRATOS DESPLEGADOS — World Chain Mainnet (480)
 
@@ -9,17 +9,39 @@ MembershipInsurance: 0xB953016dF10c80496E86E8779697972cC9780094
 MembershipContract:  0x9adCCF3df7170ae5bED7dD17FDb977F866b0f8B3
 AionicoToken:        0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc
 
+## SETTERS VERIFICADOS ON-CHAIN
+
+✅ MC.insuranceFund     → 0xB953 (MembershipInsurance)
+✅ MC.trustCircle       → 0xc32B (TrustCircle)
+✅ TC.membershipContract → 0x9adC (MembershipContract)
+✅ TC.membershipInsurance → 0xB953 (MembershipInsurance)
+✅ TC.aionicoToken      → 0x89C2 (AionicoToken)
+
 ## ESTADO GENERAL
 
 ✅ 5 contratos desplegados
-✅ 9 setters ejecutados
-✅ Frontend conectado
-✅ Membresía L1-L5 activa
-✅ Botón contribuir activo
-✅ Submit for review pendiente en Developer Portal
+✅ 9 setters ejecutados y verificados on-chain
+✅ Frontend conectado a contratos reales
+✅ Membresía L1-L5 activa (subscribe en profile)
+✅ Botón contribuir activo (Permit2)
+✅ Build limpio (21/21 páginas)
+✅ Submit for review — Developer Portal (In Review)
+✅ PR #1293 abierto — AIONICO en token list ethereum-optimism
+✅ TyC v3 + Guía v1.0 pegados en frontend
+✅ Callchain verificado frontend ↔ contratos
 
-## PENDIENTE
+## GAP IDENTIFICADO — PENDIENTE IMPLEMENTAR
 
-1. Developer Portal → Contract Entrypoints → poner address TrustCircle
-2. Developer Portal → Submit for review
-3. Pegar textos en nano src/app/guia/page.tsx y src/app/tyc/page.tsx
+⏳ settleDebt() — usuario moroso no puede rehabilitarse desde la UI
+
+Pasos para cerrar el gap:
+1. Crear src/abi/MembershipContract.json (totalDebt + settleDebt)
+2. Agregar lectura totalDebt(wallet, USDC/WLD/AIONICO) en api/profile/stats/route.ts
+3. Agregar card deuda + botón Saldar en profile/page.tsx (visible si isEligible=false)
+4. Flujo: approve(MembershipContract, amount) → settleDebt(token, amount)
+5. Build + push
+
+## PRÓXIMOS PASOS POST-REVIEW
+
+- Bounty público Code4rena / Sherlock (después de aprobación World App)
+- Preparar: docs técnicos, scope, líneas en scope, prize pool estimado
