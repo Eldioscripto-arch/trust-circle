@@ -59,8 +59,19 @@ export async function GET() {
       membership = { level, expires_at: new Date(expiresAt * 1000).toISOString() }
     }
   } catch {}
+  const MC_ADDRESS = '0x9adCCF3df7170ae5bED7dD17FDb977F866b0f8B3'
+  const MC_ABI = [{ type: 'function', name: 'totalDebt', inputs: [{ name: 'member', type: 'address' }, { name: 'token', type: 'address' }], outputs: [{ name: '', type: 'uint256' }], stateMutability: 'view' }]
+  const USDC    = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1'
+  const WLD     = '0x2cFc85d8E48F8EAB294be644d9E25C3030863003'
+  const AIONICO = '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc'
+  let debtUSDC = 0n, debtWLD = 0n, debtAIONICO = 0n
+  try {
+    debtUSDC    = await publicClient.readContract({ address: MC_ADDRESS as `0x${string}`, abi: MC_ABI, functionName: 'totalDebt', args: [wallet as `0x${string}`, USDC    as `0x${string}`] }) as bigint
+    debtWLD     = await publicClient.readContract({ address: MC_ADDRESS as `0x${string}`, abi: MC_ABI, functionName: 'totalDebt', args: [wallet as `0x${string}`, WLD     as `0x${string}`] }) as bigint
+    debtAIONICO = await publicClient.readContract({ address: MC_ADDRESS as `0x${string}`, abi: MC_ABI, functionName: 'totalDebt', args: [wallet as `0x${string}`, AIONICO as `0x${string}`] }) as bigint
+  } catch {}
 
   return NextResponse.json({
-    stats: { totalCircles, completedCircles, score, isEligible, membership }
+    stats: { totalCircles, completedCircles, score, isEligible, membership, debtUSDC: debtUSDC.toString(), debtWLD: debtWLD.toString(), debtAIONICO: debtAIONICO.toString() }
   })
 }

@@ -16,6 +16,9 @@ interface Stats {
   score: number;
   isEligible: boolean;
   membership?: { level: number; expires_at: string } | null;
+  debtUSDC?: string;
+  debtWLD?: string;
+  debtAIONICO?: string;
 }
 
 const MEMBERSHIP_LEVELS = [
@@ -36,6 +39,35 @@ export default function ProfilePage() {
   const [stats,   setStats]   = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab,     setTab]     = useState<'perfil' | 'membresia'>('perfil');
+  
+  const MC_ADDRESS = '0x9adCCF3df7170ae5bED7dD17FDb977F866b0f8B3'
+  const USDC_ADDR    = '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1'
+  const WLD_ADDR     = '0x2cFc85d8E48F8EAB294be644d9E25C3030863003'
+  const AIONICO_ADDR = '0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc'
+
+  async function handleSettleDebt() {
+    if (!MiniKit.isInstalled()) { alert('Abrí desde World App'); return; }
+    if (!stats) return;
+    const debtU = BigInt(stats.debtUSDC ?? '0')
+    const debtW = BigInt(stats.debtWLD ?? '0')
+    const debtA = BigInt(stats.debtAIONICO ?? '0')
+    const token  = debtU > 0n ? USDC_ADDR : debtW > 0n ? WLD_ADDR : AIONICO_ADDR
+    const amount = debtU > 0n ? debtU : debtW > 0n ? debtW : debtA
+    if (amount === 0n) return;
+    try {
+      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+        transaction: [
+          { address: token, abi: [{ type: 'function', name: 'approve', inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }], outputs: [{ name: '', type: 'bool' }], stateMutability: 'nonpayable' }], functionName: 'approve', args: [MC_ADDRESS, amount.toString()] },
+          { address: MC_ADDRESS, abi: [{ type: 'function', name: 'settleDebt', inputs: [{ name: 'token', type: 'address' }, { name: 'amount', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' }], functionName: 'settleDebt', args: [token, amount.toString()] },
+        ],
+      });
+      if (finalPayload.status === 'success') {
+        alert('Deuda saldada. Recargá tu perfil.');
+      } else {
+        alert('Transacción cancelada');
+      }
+    } catch (e: any) { alert(e.message || 'Error inesperado'); }
+  }
 
   async function handleSubscribe(level: number, priceUSDC: number) {
     if (!MiniKit.isInstalled()) { alert('Abrí desde World App'); return; }
@@ -134,6 +166,18 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </div>
+
+                {(BigInt(stats?.debtUSDC ?? '0') > 0n || BigInt(stats?.debtWLD ?? '0') > 0n || BigInt(stats?.debtAIONICO ?? '0') > 0n) && (
+                <div className="rounded-xl p-4" style={{ background: 'rgba(229,62,62,0.08)', border: '1px solid rgba(229,62,62,0.4)' }}>
+                  <p className="text-xs font-semibold mb-2" style={{ color: '#fc8181' }}>⚠️ DEUDA PENDIENTE — REHABILITACIÓN REQUERIDA</p>
+                  {BigInt(stats?.debtUSDC ?? '0') > 0n && <p className="text-sm mb-1" style={{ color: '#e2e8f0' }}>USDC: {(Number(BigInt(stats!.debtUSDC!)) / 1_000_000).toFixed(2)}</p>}
+                  {BigInt(stats?.debtWLD ?? '0') > 0n && <p className="text-sm mb-1" style={{ color: '#e2e8f0' }}>WLD: {(Number(BigInt(stats!.debtWLD!)) / 1e18).toFixed(4)}</p>}
+                  {BigInt(stats?.debtAIONICO ?? '0') > 0n && <p className="text-sm mb-1" style={{ color: '#e2e8f0' }}>AIONICO: {(Number(BigInt(stats!.debtAIONICO!)) / 1e18).toFixed(4)}</p>}
+                  <button onClick={handleSettleDebt} style={{ marginTop: 8, width: '100%', background: 'linear-gradient(135deg,#fc8181,#e53e3e)', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    💸 Saldar Deuda y Rehabilitarse
+                  </button>
+                </div>
+              )}
 
               <div className="rounded-xl p-4" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
                 <p className="text-xs font-semibold mb-3" style={{ color: '#718096' }}>SCORE · POSICIÓN EN CÍRCULOS ABIERTOS</p>
