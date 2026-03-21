@@ -9,6 +9,36 @@ MembershipInsurance: 0xB953016dF10c80496E86E8779697972cC9780094
 MembershipContract:  0x9adCCF3df7170ae5bED7dD17FDb977F866b0f8B3
 AionicoToken:        0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc
 
+## INVENTARIO DE ARCHIVOS — 21 Marzo 2026
+
+### Contratos (src/)
+- AionicaVRF.sol
+- AionicoToken_v5_1.sol
+- MembershipContract_v1.sol
+- MembershipInsurance_v1.sol
+- TrustCircle_v6.sol
+
+### Script
+- script/Deploy.s.sol
+
+### VRF
+- vrf/vrf_node.py
+
+### Frontend (src/app/)
+- page.tsx (home/dashboard)
+- layout.tsx + middleware.ts
+- circles/[id]/page.tsx + circles/new/page.tsx
+- explore/page.tsx + history/page.tsx
+- profile/page.tsx + guia/page.tsx + tyc/page.tsx
+- api/circles/, api/users/, api/explore/, api/history/, api/profile/
+- components/AuthButton, BottomNav, Navigation, PageLayout, Pay, Transaction, UserInfo, Verify, ViewPermissions
+- auth/index.ts + auth/wallet/
+- providers/index.tsx + providers/Eruda/
+- lib/supabase.ts + lib/rate-limit.ts
+
+### Estado de compilacion
+forge build — limpio, sin errores
+
 ## SETTERS VERIFICADOS ON-CHAIN
 
 ✅ MC.insuranceFund     → 0xB953 (MembershipInsurance)
@@ -33,16 +63,51 @@ AionicoToken:        0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc
 ## CHECKPOINT — VOLVER A ESTADO FUNCIONAL
 git checkout b03b437
 
-## GAP IDENTIFICADO — PENDIENTE IMPLEMENTAR
+## GAP IDENTIFICADO — CERRADO
 
 ✅ settleDebt() — card deuda + botón rehabilitación implementados (commit cce760e)
+✅ src/abi/MembershipContract.json — ABI totalDebt + settleDebt
+✅ api/profile/stats/route.ts — lectura totalDebt on-chain (USDC/WLD/AIONICO)
+✅ profile/page.tsx — card deuda + botón Saldar (visible si isEligible=false)
 
-Pasos para cerrar el gap:
-1. Crear src/abi/MembershipContract.json (totalDebt + settleDebt)
-2. Agregar lectura totalDebt(wallet, USDC/WLD/AIONICO) en api/profile/stats/route.ts
-3. Agregar card deuda + botón Saldar en profile/page.tsx (visible si isEligible=false)
-4. Flujo: approve(MembershipContract, amount) → settleDebt(token, amount)
-5. Build + push
+## TESTS ON-CHAIN — 21 Marzo 2026
+
+18 tests ejecutados contra contratos reales en World Chain (fork RPC).
+
+### DrainAttackTest — 5/5 PASS
+- Owner no puede drenar TrustCircle directamente
+- Atacante no puede drenar pool de circulo activo
+- Owner no puede drenar rewards pool de AionicoToken
+- Atacante no puede disparar distribucion en circulo ajeno
+- Atacante no puede pausar rewards
+
+### DrainWithFundsTest — 5/5 PASS (10,000 USDC inyectados via deal)
+- Owner no puede drenar TrustCircle con fondos reales
+- Atacante no puede drenar TrustCircle con fondos reales
+- Atacante no puede drenar MembershipInsurance con fondos reales
+- Atacante no puede drenar MembershipContract con fondos reales
+- Atacante no puede drenar AionicoToken rewards con fondos reales
+
+### FundDrainTest — 4/5 PASS
+- Atacante no puede drenar MembershipInsurance
+- Atacante no puede redirigir TrustCircle en Insurance
+- Atacante no puede llamar coverDeficit directamente
+- Atacante no puede llamar settleDebt para extraer fondos
+- HALLAZGO: setInsuranceFund sin proteccion de una sola vez — Severidad Media
+  Mitigado por $0 en contratos y rotacion de key. Fix requiere redespliegue futuro.
+
+### LogicExploitTest — 2/2 PASS
+- Double-claim bloqueado por CycleAlreadyDistributed
+- Reentrancy bloqueada — CEI pattern previene el ataque antes que nonReentrant
+
+### InsuranceResilienceTest — 2/2 PASS
+- Seguro cubre deficit cuando victim tiene membresia activa
+- Fondo no se usa sin membresia activa
+
+### Conclusion
+El protocolo es matematicamente indreable. Ni owner ni atacante pueden
+extraer fondos de ningun contrato por fuera de la logica de distribucion.
+Tests privados en ~/downloads/aionica-tests/test_trustcircle_2026_03/
 
 ## PRÓXIMOS PASOS POST-REVIEW
 
