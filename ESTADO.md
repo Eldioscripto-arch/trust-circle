@@ -53,7 +53,7 @@ forge build — limpio, sin errores
 ## ESTADO GENERAL
 
 ✅ 6 contratos desplegados
-✅ 9 setters ejecutados y verificados on-chain
+✅ 10 setters ejecutados y verificados on-chain
 ✅ Frontend conectado a contratos reales
 ✅ Membresía L1-L5 activa (subscribe en profile)
 ✅ Botón contribuir activo (Permit2)
