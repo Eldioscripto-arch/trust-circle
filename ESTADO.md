@@ -1,5 +1,5 @@
 # ESTADO DEL PROYECTO — AIONICA Trust Circle
-Actualizado: 21 Marzo 2026
+Actualizado: 01 Abril 2026
 
 ## CONTRATOS DESPLEGADOS — World Chain Mainnet (480)
 
@@ -8,11 +8,13 @@ TrustCircle:         0xc32Bdc20014B8aE63FCA57597b29DAC856BCE2Cf
 MembershipInsurance: 0xB953016dF10c80496E86E8779697972cC9780094
 MembershipContract:  0x9adCCF3df7170ae5bED7dD17FDb977F866b0f8B3
 AionicoToken:        0x89C2A3fC33bc7cc1140e6408e050De230D5cC0Dc
+AionicaPriceOracle:  0x1998E24F736FdD52fA17C4e10AaF54315B32a2cb
 
-## INVENTARIO DE ARCHIVOS — 21 Marzo 2026
+## INVENTARIO DE ARCHIVOS — 01 Abril 2026
 
 ### Contratos (src/)
 - AionicaVRF.sol
+- AionicaPriceOracle.sol
 - AionicoToken_v5_1.sol
 - MembershipContract_v1.sol
 - MembershipInsurance_v1.sol
@@ -46,10 +48,11 @@ forge build — limpio, sin errores
 ✅ TC.membershipContract → 0x9adC (MembershipContract)
 ✅ TC.membershipInsurance → 0xB953 (MembershipInsurance)
 ✅ TC.aionicoToken      → 0x89C2 (AionicoToken)
+✅ MI.priceOracles(WLD) → 0x1998 (AionicaPriceOracle)
 
 ## ESTADO GENERAL
 
-✅ 5 contratos desplegados
+✅ 6 contratos desplegados
 ✅ 9 setters ejecutados y verificados on-chain
 ✅ Frontend conectado a contratos reales
 ✅ Membresía L1-L5 activa (subscribe en profile)
@@ -59,6 +62,8 @@ forge build — limpio, sin errores
 ✅ PR #1293 abierto — AIONICO en token list ethereum-optimism
 ✅ TyC v3 + Guía v1.0 pegados en frontend
 ✅ Callchain verificado frontend ↔ contratos
+✅ APP ID: app_da9a97ceb52e3ad29b347c4ebfeff06f
+✅ RP ID:  rp_342690606f606aef
 
 ## CHECKPOINT — VOLVER A ESTADO FUNCIONAL
 git checkout b03b437
@@ -109,7 +114,25 @@ El protocolo es matematicamente indreable. Ni owner ni atacante pueden
 extraer fondos de ningun contrato por fuera de la logica de distribucion.
 Tests privados en ~/downloads/aionica-tests/test_trustcircle_2026_03/
 
+## BOUNTY 4 — FIXES APLICADOS (01 Abril 2026)
+
+✅ NV-01 — Double-pay a victima al cierre: victimReceivedFromPool mapping agregado en MC, consultado en refund loop de TC
+✅ NV-02 — settleDebt no actualizaba debtByCircle: sincronizacion agregada en loop FIFO
+✅ NV-03 — coverDeficit aceptaba cualquier token sin oracle: path multi-token con IPriceOracle implementado
+✅ Reporte Bounty4 generado — formato C4/Sherlock
+
 ## PRÓXIMOS PASOS POST-REVIEW
 
 - Bounty público Code4rena / Sherlock (después de aprobación World App)
 - Preparar: docs técnicos, scope, líneas en scope, prize pool estimado
+
+## COMANDOS DE REFERENCIA
+
+### Desarrollo local
+cd ~/downloads/trust-circle && npm run dev
+
+### Repositorio
+git clone https://github.com/Eldioscripto-arch/trust-circle.git
+
+### Checkpoint funcional
+git checkout b03b437
