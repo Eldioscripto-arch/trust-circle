@@ -135,4 +135,4 @@ cd ~/downloads/trust-circle && npm run dev
 git clone https://github.com/Eldioscripto-arch/trust-circle.git
 
 ### Checkpoint funcional
-git checkout b03b437
+git checkout 18c6e7c

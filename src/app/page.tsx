@@ -51,17 +51,17 @@ function CircleCard({ circle }: { circle: Circle }) {
       borderTopWidth: 2, borderTopColor: circle.status === 'pending' ? '#e53e3e' : circle.status === 'paid' ? '#38a169' : '#2a3441' }}>
       <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="font-bold text-sm" style={{ color: '#e2e8f0' }}>{circle.name}</p>
-          <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{circle.members}/{circle.maxMembers} miembros · {circle.currency === 'USDC' ? '$' : ''}{circle.contribution} {circle.currency}/ciclo</p>
+          <p className="font-bold text-sm" className="tc-text-primary">{circle.name}</p>
+          <p className="text-xs mt-0.5" className="tc-text-secondary">{circle.members}/{circle.maxMembers} miembros · {circle.currency === 'USDC' ? '$' : ''}{circle.contribution} {circle.currency}/ciclo</p>
         </div>
         <Badge status={circle.status} />
       </div>
       <div className="mb-3">
         <div className="flex justify-between mb-1.5">
-          <span className="text-xs" style={{ color: '#4a5568' }}>{circle.status === 'open' ? 'Esperando miembros' : `Ciclo ${circle.cycle} de ${circle.totalCycles}`}</span>
+          <span className="text-xs" className="tc-text-muted">{circle.status === 'open' ? 'Esperando miembros' : `Ciclo ${circle.cycle} de ${circle.totalCycles}`}</span>
           <span className="text-xs" style={{ color: timeColor }}>{timeLabel}</span>
         </div>
-        <div className="h-1 rounded-full" style={{ background: '#1c2330' }}>
+        <div className="h-1 rounded-full" className="tc-bg-track">
           <div className="h-full rounded-full" style={{ width: `${progress}%`, background: barColor }} />
         </div>
       </div>
@@ -69,15 +69,15 @@ function CircleCard({ circle }: { circle: Circle }) {
         <div className="flex items-center gap-2">
           <div className="flex gap-0.5">
             {Array.from({ length: Math.min(circle.maxMembers, 10) }).map((_, i) => (
-              <div key={i} className="w-2 h-2 rounded-full" style={{ background: i < circle.paidCount ? '#38a169' : '#2a3441' }} />
+              <div key={i} className="w-2 h-2 rounded-full" className={i < circle.paidCount ? "tc-dot-on w-2 h-2 rounded-full" : "tc-bg-dot-off w-2 h-2 rounded-full"} />
             ))}
           </div>
-          <span className="text-xs" style={{ color: '#718096' }}>
+          <span className="text-xs" className="tc-text-secondary">
             {circle.status === 'open' ? `${circle.members}/${circle.maxMembers} unidos` : `${circle.paidCount}/${circle.members} pagaron`}
           </span>
         </div>
-        <span className="font-bold text-sm" style={{ color: '#f0b429' }}>
-          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText('https://worldcoin.org/mini-app?app_id=app_da9a97ceb52e3ad29b347c4ebfeff06f&path=/circles/'+circle.id);alert('Link copiado');}} style={{cursor:'pointer'}}>{circle.status==='open'?'Invitar →':circle.token === '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1' ? `$${circle.poolAmount} USDC en pozo` : `${circle.poolAmount} ${circle.token === '0x2cFc85d8E48F8EAB294be644d9E25C3030863003' ? 'WLD' : 'AIONICO'} en pozo`}</span>
+        <span className="font-bold text-sm" className="tc-text-accent">
+          <span onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText('https://worldcoin.org/mini-app?app_id=app_da9a97ceb52e3ad29b347c4ebfeff06f&path=/circles/'+circle.id);alert('Link copiado');}} className="cursor-pointer">{circle.status==='open'?'Invitar →':circle.token === '0x79A02482A880bCE3F13e09Da970dC34db4CD24d1' ? `$${circle.poolAmount} USDC en pozo` : `${circle.poolAmount} ${circle.token === '0x2cFc85d8E48F8EAB294be644d9E25C3030863003' ? 'WLD' : 'AIONICO'} en pozo`}</span>
         </span>
       </div>
     </div>
@@ -145,21 +145,21 @@ export default function Home() {
 
   if (status === 'loading') {
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d1117' }}>
-      <p style={{ color: '#4a5568' }}>Cargando...</p>
+    <div className="min-h-screen flex items-center justify-center" className="tc-bg-dark">
+      <p className="tc-text-muted">Cargando...</p>
     </div>
   );
 }
 
 if (!session) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-8" style={{ background: '#0d1117' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-8" className="tc-bg-dark">
         <div className="text-center">
-          <h1 className="font-black text-3xl" style={{ color: '#f0b429', letterSpacing: -1 }}>
-            Trust<span style={{ color: '#718096', fontWeight: 400 }}>Circle</span>
+          <h1 className="font-black text-3xl tc-text-accent" style={{ letterSpacing: -1 }}>
+            Trust<span className="tc-text-secondary" style={{ fontWeight: 400 }}>Circle</span>
           </h1>
-          <p className="mt-2 text-sm" style={{ color: '#4a5568' }}>Círculos de ahorro verificados</p>
-          <p className="mt-1 text-xs" style={{ color: '#2a3441' }}>by AIONICA Labs</p>
+          <p className="mt-2 text-sm" className="tc-text-muted">Círculos de ahorro verificados</p>
+          <p className="mt-1 text-xs" className="tc-text-muted">by AIONICA Labs</p>
         </div>
         <AuthButton />
       </div>
@@ -168,19 +168,19 @@ if (!session) {
 
   return (
     <>
-      <div className="min-h-screen pb-28" style={{ background: '#0d1117' }}>
+      <div className="min-h-screen pb-28" className="tc-bg-dark">
 
         <div className="flex items-center justify-between px-5 pt-5">
-          <h1 className="font-black text-lg" style={{ color: '#f0b429', letterSpacing: -0.5 }}>
-            Trust<span style={{ color: '#718096', fontWeight: 400 }}>Circle</span>
+          <h1 className="font-black text-lg tc-text-accent" style={{ letterSpacing: -0.5 }}>
+            Trust<span className="tc-text-secondary" style={{ fontWeight: 400 }}>Circle</span>
           </h1>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <div className="flex flex-col items-center gap-0.5">
             <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-black"
-              style={{ background: 'linear-gradient(135deg, #f0b429, #ed8936)' }}>
+              style={{ background: "linear-gradient(135deg, #f0b429, #ed8936)" }}>
               {session.user?.name?.slice(2, 4).toUpperCase() || 'TC'}
             </div>
             <button onClick={() => { signOut({ redirect: false }).then(() => { window.location.href = '/'; }) }}
-              style={{ background: 'none', border: 'none', color: '#4a5568', fontSize: 10, cursor: 'pointer', padding: 0 }}>
+              className="tc-text-muted cursor-pointer" style={{ background: "none", border: "none", fontSize: 10, padding: 0 }}>
               salir
             </button>
           </div>
@@ -188,33 +188,33 @@ if (!session) {
 
         {pendingCircle && (
           <div className="mx-5 mt-4 rounded-xl border px-4 py-3 flex items-center gap-3 cursor-pointer"
-            style={{ background: 'rgba(229,62,62,0.10)', borderColor: 'rgba(229,62,62,0.35)' }}
+            className="tc-alert-bg"
             onClick={() => router.push(`/circles/${pendingCircle.id}`)}>
-            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#e53e3e' }} />
+            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#e53e3e" }} />
             <div className="flex-1">
-              <p className="text-sm font-medium" style={{ color: '#fc8181' }}>Pago pendiente hoy</p>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(252,129,129,0.7)' }}>
+              <p className="text-sm font-medium" className="tc-text-error">Pago pendiente hoy</p>
+              <p className="text-xs mt-0.5" className="tc-text-error opacity-70">
                 {pendingCircle.name} · cierra en {pendingCircle.hoursLeft}h · {pendingCircle.currency === 'USDC' ? '$' : ''}{pendingCircle.contribution} {pendingCircle.currency}
               </p>
             </div>
-            <span style={{ color: '#fc8181', fontSize: 18 }}>›</span>
+            <span className="tc-text-error" style={{ fontSize: 18 }}>›</span>
           </div>
         )}
 
-        <div className="mx-5 mt-4 rounded-2xl p-6" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
-          <p className="text-xs uppercase tracking-widest" style={{ color: '#718096' }}>Total en círculos</p>
+        <div className="mx-5 mt-4 rounded-2xl p-6" className="tc-bg-card border tc-border">
+          <p className="text-xs uppercase tracking-widest" className="tc-text-secondary">Total en círculos</p>
           <div className="mt-2 leading-none">
             {loading ? (
-              <span className="font-black" style={{ fontSize: 42, letterSpacing: -2, color: '#e2e8f0' }}>...</span>
+              <span className="font-black tc-text-primary" style={{ fontSize: 42, letterSpacing: -2 }}>...</span>
             ) : Object.keys(totalsByToken).length === 0 ? (
-              <span className="font-black" style={{ fontSize: 42, letterSpacing: -2, color: '#e2e8f0' }}>0</span>
+              <span className="font-black tc-text-primary" style={{ fontSize: 42, letterSpacing: -2 }}>0</span>
             ) : (
               <div className="flex flex-col gap-1">
                 {Object.entries(totalsByToken).map(([token, amount]) => (
                   <div key={token} className="flex items-baseline gap-1">
-                    {token === 'USDC' && <span className="text-lg font-semibold align-super" style={{ color: '#2775ca' }}>$</span>}
-                    <span className="font-black" style={{ fontSize: 36, letterSpacing: -2, color: '#e2e8f0' }}>{(amount as number).toLocaleString()}</span>
-                    <span className="text-lg font-semibold" style={{ color: '#718096' }}>{token}</span>
+                    {token === 'USDC' && <span className="text-lg font-semibold align-super" className="tc-text-blue">$</span>}
+                    <span className="font-black tc-text-primary" style={{ fontSize: 36, letterSpacing: -2 }}>{(amount as number).toLocaleString()}</span>
+                    <span className="text-lg font-semibold" className="tc-text-secondary">{token}</span>
                   </div>
                 ))}
               </div>
@@ -222,31 +222,31 @@ if (!session) {
           </div>
           <div className="mt-4 flex gap-5">
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs uppercase" style={{ color: '#4a5568', letterSpacing: 1 }}>Círculos activos</span>
-              <span className="text-sm font-semibold" style={{ color: '#f0b429' }}>{activeCount}</span>
+              <span className="text-xs uppercase tc-text-muted" style={{ letterSpacing: 1 }}>Círculos activos</span>
+              <span className="text-sm font-semibold" className="tc-text-accent">{activeCount}</span>
             </div>
-            <div style={{ width: 1, background: '#2a3441' }} />
+            <div className="w-px tc-bg-dot-off" />
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs uppercase" style={{ color: '#4a5568', letterSpacing: 1 }}>Total círculos</span>
-              <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>{circles.length}</span>
+              <span className="text-xs uppercase tc-text-muted" style={{ letterSpacing: 1 }}>Total círculos</span>
+              <span className="text-sm font-semibold" className="tc-text-primary">{circles.length}</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-between px-5 mt-6 mb-3">
-          <h2 className="font-bold text-base" style={{ color: '#e2e8f0' }}>Mis círculos</h2>
-          <span className="text-xs cursor-pointer" style={{ color: '#f0b429' }} onClick={() => router.push('/history')}>Ver historial →</span>
+          <h2 className="font-bold text-base" className="tc-text-primary">Mis círculos</h2>
+          <span className="text-xs cursor-pointer" className="tc-text-accent" onClick={() => router.push('/history')}>Ver historial →</span>
         </div>
 
         <div className="px-5 flex flex-col gap-2.5">
           {loading && (
-            <div className="text-center py-8" style={{ color: '#4a5568' }}>Cargando...</div>
+            <div className="text-center py-8" className="tc-text-muted">Cargando...</div>
           )}
           {!loading && circles.length === 0 && (
-            <div className="text-center py-12 rounded-2xl" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
+            <div className="text-center py-12 rounded-2xl" className="tc-bg-card border tc-border">
               <p className="text-2xl mb-3">⬡</p>
-              <p className="text-sm font-medium" style={{ color: '#e2e8f0' }}>Aún no tienes círculos</p>
-              <p className="text-xs mt-1" style={{ color: '#4a5568' }}>Toca + para crear el primero</p>
+              <p className="text-sm font-medium" className="tc-text-primary">Aún no tienes círculos</p>
+              <p className="text-xs mt-1" className="tc-text-muted">Toca + para crear el primero</p>
             </div>
           )}
           {circles.map(c => <CircleCard key={c.id} circle={c} />)}

@@ -75,18 +75,21 @@ export default function ProfilePage() {
     const nonce = Date.now().toString();
     const deadline = Math.floor((Date.now() + 30 * 60 * 1000) / 1000).toString();
     try {
-      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
-        transaction: [{
-          address: MEMBERSHIP_INSURANCE_ADDRESS,
-          abi: MembershipInsuranceABI,
-          functionName: 'subscribe',
-          args: [level, USDC_ADDRESS],
-        }],
-        permit2: [{
-          permitted: { token: USDC_ADDRESS, amount: amountRaw },
-          nonce, deadline,
-          spender: MEMBERSHIP_INSURANCE_ADDRESS,
-        }],
+    const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+        transaction: [
+          {
+            address: USDC_ADDRESS,
+            abi: [{ type: 'function', name: 'approve', inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }], outputs: [{ name: '', type: 'bool' }], stateMutability: 'nonpayable' }],
+            functionName: 'approve',
+            args: [MEMBERSHIP_INSURANCE_ADDRESS, amountRaw],
+          },
+          {
+            address: MEMBERSHIP_INSURANCE_ADDRESS,
+            abi: MembershipInsuranceABI,
+            functionName: 'subscribe',
+            args: [level, USDC_ADDRESS],
+          },
+        ],
       });
       if (finalPayload.status === 'success') {
         alert('Membresía contratada. Recargá tu perfil.');

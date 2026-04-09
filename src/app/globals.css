@@ -38,3 +38,18 @@ main {
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
 }
+
+/* Trust Circle Design System */
+.tc-bg-dark     { background: #0d1117; }
+.tc-bg-card     { background: #161b22; }
+.tc-bg-track    { background: #1c2330; }
+.tc-bg-dot-off  { background: #2a3441; }
+.tc-border      { border-color: #2a3441; }
+.tc-text-primary   { color: #e2e8f0; }
+.tc-text-secondary { color: #718096; }
+.tc-text-muted     { color: #4a5568; }
+.tc-text-accent    { color: #f0b429; }
+.tc-text-blue      { color: #2775ca; }
+.tc-text-error     { color: #fc8181; }
+.tc-dot-on      { background: #38a169; }
+.tc-alert-bg { background: rgba(229,62,62,0.10); border-color: rgba(229,62,62,0.35); }
