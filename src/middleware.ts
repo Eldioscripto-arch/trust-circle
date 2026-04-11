@@ -3,14 +3,12 @@ import { NextResponse } from 'next/server'
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth
-  const isApiAuth = req.nextUrl.pathname.startsWith('/api/auth')
-  const isApiPublic = req.nextUrl.pathname.startsWith('/api/circles') && req.method === 'GET'
+  const pathname = req.nextUrl.pathname
 
-  // Permitir rutas de auth siempre
-  if (isApiAuth) return NextResponse.next()
+  if (pathname.startsWith('/api')) return NextResponse.next()
+  if (pathname === '/') return NextResponse.next()
 
-  // Si no hay sesión → redirigir a login (página principal con AuthButton)
-  if (!isLoggedIn && req.nextUrl.pathname !== '/') {
+  if (!isLoggedIn) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
