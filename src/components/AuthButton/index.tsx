@@ -31,6 +31,20 @@ export const AuthButton = () => {
     }
   }, [isInstalled, doAuth]);
 
+  if (!isInstalled) {
+    return (
+      <div className="flex flex-col items-center gap-4 text-center px-6">
+        <p className="tc-text-secondary text-sm">Esta app funciona dentro de World App.</p>
+        <a
+          href="https://world.org/mini-app?app_id=app_da9a97ceb52e3ad29b347c4ebfeff06f"
+          style={{ background: 'linear-gradient(135deg, #f0b429, #ed8936)', color: '#000', border: 'none', padding: '16px 40px', borderRadius: 16, fontSize: 16, fontWeight: 700, textDecoration: 'none', minWidth: 240, display: 'inline-block', textAlign: 'center' }}
+        >
+          Abrir en World App →
+        </a>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
       {error && (
