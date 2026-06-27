@@ -91,7 +91,7 @@ export default function CircleDetailPage() {
 
   useEffect(() => {
     if (txId && txConfirmed) {
-      setSuccess('¡Contribución confirmada on-chain! +10 AIONICO 🎉')
+      setSuccess('¡Contribución confirmada on-chain! +10 AIONICO')
       setContributing(false)
       setHasPaid(true)
     }
@@ -276,7 +276,7 @@ async function handleCancel() {
             recipient: members[circle.current_cycle ?? 0]?.wallet ?? '',
           }),
         }).catch(() => {})
-        setSuccess('¡Distribución ejecutada! +50 AIONICO 🎉')
+        setSuccess('¡Distribución ejecutada! +50 AIONICO')
         setDistributing(false)
       } else {
         setError('Transacción cancelada')
@@ -352,8 +352,8 @@ async function handleCancel() {
         </div>
       </div>
 
-      {success && <div style={{ margin: '12px 20px 0', background: 'rgba(56,161,105,0.12)', border: '1px solid rgba(56,161,105,0.3)', borderRadius: 12, padding: '12px 16px', fontSize: 14, color: '#68d391' }}>🎉 {success}</div>}
-      {error   && <div style={{ margin: '12px 20px 0', background: 'rgba(229,62,62,0.1)',  border: '1px solid rgba(229,62,62,0.3)',  borderRadius: 12, padding: '12px 16px', fontSize: 14, color: '#fc8181' }}>⚠️ {error}</div>}
+      {success && <div style={{ margin: '12px 20px 0', background: 'rgba(56,161,105,0.12)', border: '1px solid rgba(56,161,105,0.3)', borderRadius: 12, padding: '12px 16px', fontSize: 14, color: '#68d391' }}>{success}</div>}
+      {error   && <div style={{ margin: '12px 20px 0', background: 'rgba(229,62,62,0.1)',  border: '1px solid rgba(229,62,62,0.3)',  borderRadius: 12, padding: '12px 16px', fontSize: 14, color: '#fc8181' }}>{error}</div>}
 
       <div style={{ padding: '16px 20px 0' }}>
         {!isMember && canJoin && (
@@ -364,18 +364,18 @@ async function handleCancel() {
         )}
         {isMember && circle.status === 'open' && (
           <div style={{ background: 'rgba(56,161,105,0.12)', border: '1px solid rgba(56,161,105,0.3)', borderRadius: 12, padding: '14px 16px', fontSize: 14, color: '#68d391', textAlign: 'center' }}>
-            ✅ Eres miembro · esperando que se complete el círculo
+            Eres miembro · esperando que se complete el círculo
           </div>
         )}
         {canContribute && (
           hasPaid ? (
             <div style={{ background: 'rgba(56,161,105,0.12)', border: '1px solid rgba(56,161,105,0.3)', borderRadius: 12, padding: '14px 16px', fontSize: 14, color: '#68d391', textAlign: 'center' }}>
-              ✅ Ya pagaste este ciclo
+              Ya pagaste este ciclo
             </div>
           ) : (
             <button onClick={handleContribute} disabled={contributing}
               style={{ width: '100%', background: contributing ? '#2a3441' : 'linear-gradient(135deg,#38a169,#2f855a)', color: '#fff', border: '1px solid transparent', padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: contributing ? 'not-allowed' : 'pointer' }}>
-              {contributing ? (txId ? 'Confirmando on-chain...' : 'Firmando...') : `💸 Contribuir ${tokenAmt(circle.token, circle.contribution_amount)}`}
+              {contributing ? (txId ? 'Confirmando on-chain...' : 'Firmando...') : `Contribuir ${tokenAmt(circle.token, circle.contribution_amount)}`}
             </button>
           )
         )}
@@ -385,7 +385,7 @@ async function handleCancel() {
         {canDistribute && (
           <button onClick={handleDistribute} disabled={distributing}
             style={{ width: '100%', background: distributing ? '#2a3441' : 'linear-gradient(135deg,#3182ce,#2b6cb0)', color: '#fff', border: '1px solid transparent', padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: distributing ? 'not-allowed' : 'pointer' }}>
-            {distributing ? 'Firmando...' : '🏆 Distribuir pozo del ciclo'}
+            {distributing ? 'Firmando...' : 'Distribuir pozo del ciclo'}
           </button>
         )}
         {canCancel && (
@@ -408,7 +408,7 @@ async function handleCancel() {
             <div key={m.wallet} style={{ background: '#161b22', border: '1px solid #2a3441', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: '50%', background: colors[i % colors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#000', flexShrink: 0 }}>#{i+1}</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 500 }}>{m.wallet.toLowerCase() === wallet ? '👤 Tú' : shortWallet(m.wallet)}</div>
+                <div style={{ fontSize: 14, fontWeight: 500 }}>{m.wallet.toLowerCase() === wallet ? 'Tú' : shortWallet(m.wallet)}</div>
                 <div style={{ fontSize: 11, color: '#718096', marginTop: 2 }}>{new Date(m.joined_at).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</div>
               </div>
               <div style={{ fontSize: 12, color: '#718096' }}>Turno {m.position+1}</div>

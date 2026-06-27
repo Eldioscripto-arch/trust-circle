@@ -246,7 +246,7 @@ export default function NewCircle() {
                 { label: 'Token', value: form.token === USDC_ADDRESS ? 'USDC' : form.token === WLD_ADDRESS ? 'WLD' : 'AIONICO' },
                 { label: 'Duración', value: DURATIONS.find(d => d.seconds === form.duration)?.label },
                 { label: 'Miembros', value: `${form.maxMembers} personas` },
-                { label: 'Orden', value: form.isOpen ? '🎲 Aleatorio (VRF)' : '📋 Fijo' },
+                { label: 'Orden', value: form.isOpen ? 'Aleatorio (VRF)' : 'Fijo' },
                 { label: 'Visibilidad', value: form.isPublic ? 'Público' : 'Privado' },
               ].map(item => (
                 <div key={item.label} className="flex justify-between">

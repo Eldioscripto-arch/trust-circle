@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
+import { Star, Hexagon, CheckCircle, Shield, WarningTriangle, MoneySquare } from 'iconoir-react';
 import { MiniKit } from '@worldcoin/minikit-js';
 import MembershipInsuranceABI from '@/abi/MembershipInsurance.json';
 
@@ -136,7 +137,7 @@ export default function ProfilePage() {
           <p className="font-bold text-sm truncate">{shortWallet(wallet)}</p>
           <span className="text-xs px-2 py-0.5 rounded-full mt-1 inline-block"
             style={{ background: 'rgba(56,161,105,0.15)', color: '#68d391' }}>
-            ✅ World ID verificado
+            World ID verificado
           </span>
         </div>
       </div>
@@ -157,10 +158,10 @@ export default function ProfilePage() {
             <>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Score',            value: stats?.score ?? 0,             color: '#f0b429', icon: '⭐' },
-                  { label: 'Círculos totales',  value: stats?.totalCircles ?? 0,      color: '#e2e8f0', icon: '⬡'  },
-                  { label: 'Completados',       value: stats?.completedCircles ?? 0,  color: '#68d391', icon: '✅' },
-                  { label: 'Elegible',          value: stats?.isEligible ? 'Sí' : 'No', color: stats?.isEligible ? '#68d391' : '#fc8181', icon: '🛡️' },
+                  { label: 'Score',            value: stats?.score ?? 0,             color: '#f0b429', icon: Star },
+                  { label: 'Círculos totales',  value: stats?.totalCircles ?? 0,      color: '#e2e8f0', icon: Hexagon  },
+                  { label: 'Completados',       value: stats?.completedCircles ?? 0,  color: '#68d391', icon: CheckCircle },
+                  { label: 'Elegible',          value: stats?.isEligible ? 'Sí' : 'No', color: stats?.isEligible ? '#68d391' : '#fc8181', icon: Shield },
                 ].map(item => (
                   <div key={item.label} className="rounded-xl p-4"
                     style={{ background: '#161b22', border: '1px solid #2a3441' }}>
@@ -172,12 +173,12 @@ export default function ProfilePage() {
 
                 {(BigInt(stats?.debtUSDC ?? '0') > 0n || BigInt(stats?.debtWLD ?? '0') > 0n || BigInt(stats?.debtAIONICO ?? '0') > 0n) && (
                 <div className="rounded-xl p-4" style={{ background: 'rgba(229,62,62,0.08)', border: '1px solid rgba(229,62,62,0.4)' }}>
-                  <p className="text-xs font-semibold mb-2" style={{ color: '#fc8181' }}>⚠️ DEUDA PENDIENTE — REHABILITACIÓN REQUERIDA</p>
+                  <p className="text-xs font-semibold mb-2" style={{ color: '#fc8181' }}>DEUDA PENDIENTE — REHABILITACIÓN REQUERIDA</p>
                   {BigInt(stats?.debtUSDC ?? '0') > 0n && <p className="text-sm mb-1" style={{ color: '#e2e8f0' }}>USDC: {(Number(BigInt(stats!.debtUSDC!)) / 1_000_000).toFixed(2)}</p>}
                   {BigInt(stats?.debtWLD ?? '0') > 0n && <p className="text-sm mb-1" style={{ color: '#e2e8f0' }}>WLD: {(Number(BigInt(stats!.debtWLD!)) / 1e18).toFixed(4)}</p>}
                   {BigInt(stats?.debtAIONICO ?? '0') > 0n && <p className="text-sm mb-1" style={{ color: '#e2e8f0' }}>AIONICO: {(Number(BigInt(stats!.debtAIONICO!)) / 1e18).toFixed(4)}</p>}
                   <button onClick={handleSettleDebt} style={{ marginTop: 8, width: '100%', background: 'linear-gradient(135deg,#fc8181,#e53e3e)', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                    💸 Saldar Deuda y Rehabilitarse
+                    Saldar Deuda y Rehabilitarse
                   </button>
                 </div>
               )}

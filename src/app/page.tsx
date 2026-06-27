@@ -4,6 +4,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { AuthButton } from '@/components/AuthButton';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Hexagon } from 'iconoir-react';
 
 type CircleStatus = 'pending' | 'paid' | 'open';
 
@@ -244,7 +245,7 @@ if (!session) {
           )}
           {!loading && circles.length === 0 && (
             <div className="text-center py-12 rounded-2xl tc-bg-card border tc-border">
-              <p className="text-2xl mb-3">⬡</p>
+              <Hexagon width={36} height={36} style={{ color: "#4a5568", margin: "0 auto 12px" }} />
               <p className="text-sm font-medium tc-text-primary">Aún no tienes círculos</p>
               <p className="text-xs mt-1 tc-text-muted">Toca + para crear el primero</p>
             </div>

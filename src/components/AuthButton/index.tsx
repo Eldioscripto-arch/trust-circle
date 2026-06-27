@@ -58,7 +58,7 @@ export const AuthButton = () => {
           textAlign: 'center',
           maxWidth: 280,
         }}>
-          ⚠️ {error}
+          {error}
         </div>
       )}
       <button

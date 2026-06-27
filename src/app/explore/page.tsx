@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
+import { Search, Hexagon } from 'iconoir-react';
 
 interface Circle {
   id: string;
@@ -57,7 +58,7 @@ export default function ExplorePage() {
       </div>
 
       <div className="relative mb-5">
-        <span className="absolute left-3 top-3 text-sm" style={{ color: '#4a5568' }}>🔍</span>
+        <Search width={16} height={16} style={{ position: "absolute", left: 12, top: 14, color: "#4a5568" }} />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Buscar círculo..."
           className="w-full rounded-xl pl-9 pr-4 py-3 text-sm outline-none"
@@ -68,7 +69,7 @@ export default function ExplorePage() {
 
       {!loading && filtered.length === 0 && (
         <div className="text-center py-16 rounded-2xl" style={{ background: '#161b22', border: '1px solid #2a3441' }}>
-          <p className="text-2xl mb-3">⬡</p>
+          <Hexagon width={36} height={36} style={{ color: "#4a5568", margin: "0 auto 12px" }} />
           <p className="text-sm" style={{ color: '#718096' }}>No hay círculos públicos abiertos</p>
         </div>
       )}

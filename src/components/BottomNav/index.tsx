@@ -1,12 +1,13 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import { Home, Search, StatsReport, User } from 'iconoir-react';
 
 const TABS = [
-  { id: 'home',    path: '/',        icon: '⬡',  label: 'Inicio'   },
-  { id: 'explore', path: '/explore', icon: '🔍', label: 'Explorar' },
-  { id: 'history', path: '/history', icon: '📊', label: 'Historial'},
-  { id: 'profile', path: '/profile', icon: '👤', label: 'Perfil'   },
+  { id: 'home',    path: '/',        icon: Home,        label: 'Inicio'   },
+  { id: 'explore', path: '/explore', icon: Search,      label: 'Explorar' },
+  { id: 'history', path: '/history', icon: StatsReport, label: 'Historial'},
+  { id: 'profile', path: '/profile', icon: User,        label: 'Perfil'   },
 ];
 
 export function BottomNav() {
@@ -28,13 +29,18 @@ export function BottomNav() {
         const active = tab.path === '/'
           ? pathname === '/'
           : pathname.startsWith(tab.path);
+        const Icon = tab.icon;
         return (
           <div
             key={tab.id}
             onClick={() => router.push(tab.path)}
             className="flex-1 flex flex-col items-center gap-1 pt-2.5 cursor-pointer"
           >
-            <span style={{ fontSize: 20, opacity: active ? 1 : 0.4 }}>{tab.icon}</span>
+            <Icon
+              width={22}
+              height={22}
+              style={{ opacity: active ? 1 : 0.4, color: active ? '#f0b429' : '#4a5568' }}
+            />
             <span className="text-xs" style={{ color: active ? '#f0b429' : '#4a5568' }}>
               {tab.label}
             </span>
